@@ -22,6 +22,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "src/main.tsx", "src/App.tsx"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src"]
 }
