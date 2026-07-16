@@ -7,6 +7,9 @@ import morgan from "morgan";
 import { apiLimiter } from "./middlewares/rateLimiter";
 import { env } from "./config/env";
 
+import { toNodeHandler } from "better-auth/node";
+import { auth } from "./modules/auth";
+
 const app = express();
 
 app.use(helmet());
@@ -23,6 +26,8 @@ app.use(
     credentials: true,
   }),
 );
+
+app.all("/api/auth/{*any}", toNodeHandler(auth));
 
 app.use(express.json());
 
