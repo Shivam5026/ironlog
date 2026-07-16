@@ -1,0 +1,31 @@
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import compression from "compression";
+import morgan from "morgan";
+
+import { apiLimiter } from "./middlewares/rateLimiter";
+import { env } from "./config/env";
+
+const app = express();
+
+app.use(helmet());
+
+app.use(compression());
+
+app.use(morgan("dev"));
+
+app.use(apiLimiter);
+
+app.use(
+  cors({
+    origin: env.CLIENT_URL,
+    credentials: true,
+  }),
+);
+
+app.use(express.json());
+
+app.use(express.urlencoded({ extended: true }));
+
+export default app;
