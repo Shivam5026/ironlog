@@ -1,12 +1,27 @@
 import app from "./app";
-import { env } from "./config/env";
+import { prisma } from "./config/prisma";
 
-app.get("/", (_req, res) => {
-  res.json({
-    message: "IronLog API is running 🚀",
+const PORT = process.env.PORT || 5000;
+
+async function bootstrap() {
+  try {
+    await prisma.$connect();
+
+    console.log("✅ PostgreSQL Connected");
+
+    app.get("/test", async (_req, res) => {
+    const users = await prisma.user.findMany();
+
+    res.json(users);
   });
-});
 
-app.listen(Number(env.PORT), () => {
-  console.log(`Server running on http://localhost:${env.PORT}`);
-});
+    app.listen(PORT, () => {
+      console.log(`🚀 Server started on ${PORT}`);
+    });
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
+}
+
+bootstrap();
