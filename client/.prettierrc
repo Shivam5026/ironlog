@@ -7,5 +7,7 @@
   "tabWidth": 2,
   "useTabs": false,
   "arrowParens": "always",
-  "endOfLine": "lf"
+  "endOfLine": "lf",
+  "indent_size": 2,
+  "indent_style": "space"
 }

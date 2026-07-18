@@ -1,5 +1,24 @@
-const LoginPage = () => {
-  return <h1>Login</h1>;
-};
+import LoginForm from "@/features/auth/components/LoginForm";
 
-export default LoginPage;
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/shared/components/ui/card";
+
+export default function LoginPage() {
+  return (
+    <Card className="w-full max-w-md">
+      <CardHeader>
+        <CardTitle>Welcome back</CardTitle>
+        <CardDescription>Sign in to continue to IronLog.</CardDescription>
+      </CardHeader>
+
+      <CardContent>
+        <LoginForm />
+      </CardContent>
+    </Card>
+  );
+}
