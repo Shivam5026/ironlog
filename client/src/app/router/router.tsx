@@ -1,34 +1,68 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import RootLayout from "../../layouts/RootLayout";
+import RootLayout from "@/layouts/RootLayout";
+import AuthLayout from "@/layouts/AuthLayout";
+import DashboardLayout from "@/layouts/DashboardLayout";
 
-import HomePage from "../../pages/HomePage";
-import LoginPage from "../../pages/LoginPage";
-import RegisterPage from "../../pages/RegisterPage";
-import NotFoundPage from "../../pages/NotFoundPage";
+import GuestRoute from "@/shared/components/routes/GuestRoute";
+import ProtectedRoute from "@/shared/components/routes/ProtectedRoute";
+
+import HomePage from "@/pages/HomePage";
+import LoginPage from "@/pages/LoginPage";
+import RegisterPage from "@/pages/RegisterPage";
+import DashboardPage from "@/pages/DashboardPage";
+import NotFoundPage from "@/pages/NotFoundPage";
 
 export const router = createBrowserRouter([
+  // Public
   {
-    path: "/",
     element: <RootLayout />,
-
     children: [
       {
         index: true,
         element: <HomePage />,
       },
+    ],
+  },
 
+  // Guest-only routes
+  {
+    element: <GuestRoute />,
+    children: [
       {
-        path: "login",
-        element: <LoginPage />,
-      },
-
-      {
-        path: "register",
-        element: <RegisterPage />,
+        element: <AuthLayout />,
+        children: [
+          {
+            path: "/login",
+            element: <LoginPage />,
+          },
+          {
+            path: "/register",
+            element: <RegisterPage />,
+          },
+        ],
       },
     ],
+  },
 
-    errorElement: <NotFoundPage />,
+  // Protected routes
+  {
+    element: <ProtectedRoute />,
+    children: [
+      {
+        element: <DashboardLayout />,
+        children: [
+          {
+            path: "/dashboard",
+            element: <DashboardPage />,
+          },
+        ],
+      },
+    ],
+  },
+
+  {
+    path: "*",
+    element: <NotFoundPage />,
   },
 ]);

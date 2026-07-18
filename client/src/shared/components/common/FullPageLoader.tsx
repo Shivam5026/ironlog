@@ -1,10 +1,9 @@
+import { Spinner } from "./Spinner";
 
-type Props = {}
-
-function FullPageLoader({}: Props) {
+export function FullPageLoader() {
   return (
-    <div>FullPageLoader</div>
-  )
+    <div className="flex min-h-screen items-center justify-center">
+      <Spinner className="h-8 w-8" />
+    </div>
+  );
 }
-
-export default FullPageLoader

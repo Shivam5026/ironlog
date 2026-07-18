@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
@@ -15,6 +15,7 @@ import { getErrorMessage } from "@/shared/lib/errors";
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const login = useLogin();
 
@@ -32,6 +33,8 @@ export default function LoginForm() {
     formState: { errors },
   } = form;
 
+  const from = (location.state as { from?: Location })?.from?.pathname ?? "/dashboard";
+
   async function onSubmit(values: LoginFormData) {
     try {
       const result = await login.mutateAsync(values);
@@ -43,9 +46,7 @@ export default function LoginForm() {
 
       toast.success("Welcome back!");
 
-      navigate("/dashboard", {
-        replace: true,
-      });
+      navigate(from, { replace: true });
     } catch {
       toast.error(getErrorMessage(login.error));
     }
