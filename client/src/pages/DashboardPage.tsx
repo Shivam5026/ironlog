@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-import { Button } from "@/shared/components/ui/button";
+import { Button } from "@/shared/components/ui/Button";
 import { Spinner } from "@/shared/components/common/Spinner";
 import { getErrorMessage } from "@/shared/lib/errors";
 

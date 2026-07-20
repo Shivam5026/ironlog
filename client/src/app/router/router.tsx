@@ -13,6 +13,8 @@ import RegisterPage from "@/pages/RegisterPage";
 import DashboardPage from "@/pages/DashboardPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 
+import {ProfilePage} from "@/features/profile/page/ProfilePage";
+
 export const router = createBrowserRouter([
   // Public
   {
@@ -47,22 +49,26 @@ export const router = createBrowserRouter([
 
   // Protected routes
   {
-    element: <ProtectedRoute />,
-    children: [
-      {
-        element: <DashboardLayout />,
-        children: [
-          {
-            path: "/dashboard",
-            element: <DashboardPage />,
-          },
-        ],
-      },
-    ],
-  },
-
-  {
-    path: "*",
-    element: <NotFoundPage />,
-  },
-]);
+  element: <ProtectedRoute />,
+  children: [
+    {
+      path: "/dashboard",
+      element: <DashboardLayout />,
+      children: [
+        {
+          index: true,
+          element: <DashboardPage />,
+        },
+        {
+          path: "profile",
+          element: <ProfilePage />,
+        },
+      ],
+    },
+  ],
+},
+{
+  path: "*",
+  element: <NotFoundPage />,
+}
+])

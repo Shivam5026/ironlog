@@ -6,7 +6,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/shared/components/ui/card";
+} from "@/shared/components/ui/Card";
 
 export default function LoginPage() {
   return (
