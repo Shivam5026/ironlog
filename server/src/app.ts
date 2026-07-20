@@ -12,6 +12,8 @@ import { auth } from "./modules/auth";
 import { errorHandler } from "./middlewares/errorHandler";
 import { notFound } from "./middlewares/notFound";
 
+import profileRouter from "./modules/profile/profile.route";
+
 const app = express();
 
 app.use(helmet());
@@ -34,6 +36,8 @@ app.all("/api/auth/{*any}", toNodeHandler(auth));
 app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
+
+app.use("/api/profile", profileRouter);
 
 app.use(notFound);
 

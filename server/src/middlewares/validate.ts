@@ -1,17 +1,16 @@
-import { NextFunction, Request, Response } from "express";
-import { z } from "zod";
+import type { NextFunction, Request, Response } from "express";
+import type { ZodType } from "zod";
 
-export const validate =
-  (schema: z.ZodType) =>
-  async (
-    req: Request,
-    _res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      req.body = await schema.parseAsync(req.body);
-      next();
-    } catch (error) {
-      next(error);
+export function validate<T>(schema: ZodType<T>) {
+  return (req: Request, _res: Response, next: NextFunction) => {
+    const result = schema.safeParse(req.body);
+
+    if (!result.success) {
+      return next(result.error);
     }
+
+    req.body = result.data;
+
+    next();
   };
+}
