@@ -23,6 +23,8 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
+  profile       Profile?
+
   @@unique([email])
   @@map("user")
 }
@@ -73,4 +75,36 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model Profile {
+  id         String   @id @default(cuid())
+
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  height      Decimal?
+  weight      Decimal?
+
+  goal        Goal?
+  experience  ExperienceLevel?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("profile")
+}
+
+enum Goal {
+  LOSE_WEIGHT
+  MAINTAIN
+  GAIN_MUSCLE
+  STRENGTH
+  ENDURANCE
+}
+
+enum ExperienceLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
 }
