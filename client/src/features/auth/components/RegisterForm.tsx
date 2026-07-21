@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/shared/components/ui/Button";
 import { Input } from "@/shared/components/ui/Input";
 import { Label } from "@/shared/components/ui/Label";
+import { PasswordInput } from "@/shared/components/ui/PasswordInput";
 
 import { Spinner } from "@/shared/components/common/Spinner";
 import { getErrorMessage } from "@/shared/lib/errors";
@@ -91,13 +92,12 @@ export default function RegisterForm() {
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
 
-        <Input
+        <PasswordInput
           id="password"
-          type="password"
           placeholder="••••••••"
           autoComplete="new-password"
           disabled={registerMutation.isPending}
-          {...register("password")}
+          {...form.register("password")}
         />
 
         {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}

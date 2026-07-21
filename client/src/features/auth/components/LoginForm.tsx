@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/shared/components/ui/Button";
 import { Input } from "@/shared/components/ui/Input";
 import { Label } from "@/shared/components/ui/Label";
+import { PasswordInput } from "@/shared/components/ui/PasswordInput";
 
 import { useLogin } from "../hooks";
 import { loginSchema } from "../schemas";
@@ -74,9 +75,8 @@ export default function LoginForm() {
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
 
-        <Input
+        <PasswordInput
           id="password"
-          type="password"
           placeholder="••••••••"
           autoComplete="current-password"
           disabled={login.isPending}
