@@ -17,6 +17,7 @@
     "@better-auth/prisma-adapter": "^1.6.23",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
+    "axios": "^1.18.1",
     "better-auth": "^1.6.23",
     "compression": "^1.8.1",
     "cors": "^2.8.6",
