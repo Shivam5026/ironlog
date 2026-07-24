@@ -40,6 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/profile", profileRouter);
 app.use("/api/exercises", exerciseRoutes);
+
 app.use(notFound);
 
 app.use(errorHandler);
