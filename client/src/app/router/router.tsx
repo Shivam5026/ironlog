@@ -14,6 +14,7 @@ import DashboardPage from "@/pages/DashboardPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 
 import {ProfilePage} from "@/features/profile/page/ProfilePage";
+import ExerciseLibrary from "@/features/exercise/pages/ExerciseLibrary";
 
 export const router = createBrowserRouter([
   // Public
@@ -63,6 +64,10 @@ export const router = createBrowserRouter([
           path: "profile",
           element: <ProfilePage />,
         },
+        {
+          path: "exercises",
+          element: <ExerciseLibrary />,
+        }
       ],
     },
   ],

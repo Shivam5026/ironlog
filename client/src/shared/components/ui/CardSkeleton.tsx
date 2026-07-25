@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader } from "./Card";
 import { Skeleton } from "./Skeleton";
 
 interface CardSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
+  image?: boolean;
   showHeader?: boolean;
   rows?: number;
 }
