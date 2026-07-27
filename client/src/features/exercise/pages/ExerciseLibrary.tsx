@@ -1,70 +1,108 @@
-import { useState } from "react";
-
 import SearchBar from "../components/SearchBar";
-import SearchResults from "../components/SearchResults";
+import SearchResults from "../components/ExerciseResults";
+import FilterBar from "../components/FilterBar";
+import FilterChip from "../components/FilterChip";
+import Pagination from "../components/Pagination";
 
 import { useDebounce } from "../hooks/useDebounce";
-import { useSearchExercises } from "../hooks/useSearchExercises";
+import { useExercises } from "../hooks/useExercises";
+import { useBodyParts } from "../hooks/useBodyParts";
+import { useTargetMuscles } from "../hooks/useTargetMuscles";
+import { useEquipments } from "../hooks/useEquipments";
+import { useExerciseFilters } from "../hooks/useExerciseFilters";
 
 export default function ExerciseLibrary() {
-  const [search, setSearch] = useState("");
+  const { filters, updateFilters, resetFilters, nextPage, previousPage } = useExerciseFilters();
 
-  const debouncedSearch = useDebounce(search, 300);
+  const debouncedSearch = useDebounce(filters.search, 300);
 
-  const {
-    data,
-    isPending,
-    isFetching,
-    isError,
-    error,
-  } = useSearchExercises({
+  const { data, isPending, isFetching, isError, error } = useExercises({
+    ...filters,
     search: debouncedSearch,
   });
 
-  const normalizedSearch = debouncedSearch.trim();
+  const exercises = data?.data.data ?? [];
+  const meta = data?.data.meta;
+
+  function handleFilterChange(field: keyof typeof filters, value: string) {
+    updateFilters({
+      [field]: value,
+      after: undefined,
+      before: undefined,
+    });
+  }
+
+  function handleResetFilters() {
+    resetFilters();
+  }
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 px-6 py-10">
-      <div>
-        <h1 className="text-4xl font-bold">
-          Exercise Library
-        </h1>
+      <header>
+        <h1 className="text-4xl font-bold">Exercise Library</h1>
 
         <p className="mt-2 text-slate-400">
-          Search thousands of exercises by name.
+          Discover exercises, filter by muscle group, equipment and body part.
         </p>
-      </div>
+      </header>
 
       <SearchBar
-        value={search}
-        onChange={setSearch}
+        value={filters.search}
+        onChange={(value) =>
+          updateFilters({
+            search: value,
+          })
+        }
       />
 
-      {normalizedSearch.length > 0 &&
-        normalizedSearch.length < 2 && (
-          <p className="text-sm text-slate-400">
-            Type at least 2 characters to search.
-          </p>
+      <FilterBar
+        filters={filters}
+        bodyParts={useBodyParts().data ?? []}
+        targetMuscles={useTargetMuscles().data ?? []}
+        equipments={useEquipments().data ?? []}
+        onChange={handleFilterChange}
+        onReset={handleResetFilters}
+      />
+
+      <div className="flex flex-wrap gap-2">
+        {filters.bodyParts && (
+          <FilterChip
+            label="Body"
+            value={filters.bodyParts}
+            onRemove={() => handleFilterChange("bodyParts", "")}
+          />
         )}
 
-      {isFetching && !isPending && (
-        <div className="text-sm text-slate-400">
-          Updating results...
-        </div>
-      )}
+        {filters.targetMuscles && (
+          <FilterChip
+            label="Muscle"
+            value={filters.targetMuscles}
+            onRemove={() => handleFilterChange("targetMuscles", "")}
+          />
+        )}
 
-      {normalizedSearch.length >= 2 ? (
-        <SearchResults
-          exercises={data?.data ?? []}
-          isPending={isPending}
-          isError={isError}
-          error={error}
-        />
-      ) : (
-        <div className="rounded-xl border border-dashed border-slate-700 py-16 text-center text-slate-500">
-          Start typing to search exercises.
-        </div>
-      )}
+        {filters.equipments && (
+          <FilterChip
+            label="Equipment"
+            value={filters.equipments}
+            onRemove={() => handleFilterChange("equipments", "")}
+          />
+        )}
+      </div>
+
+      {isFetching && !isPending && <p className="text-sm text-slate-400">Updating exercises...</p>}
+
+      <p className="text-sm text-slate-400">{meta?.total ?? 0} exercises found</p>
+
+      <SearchResults exercises={exercises} isPending={isPending} isError={isError} error={error} />
+
+      <Pagination
+        hasNextPage={meta?.hasNextPage ?? false}
+        hasPreviousPage={meta?.hasPreviousPage ?? false}
+        isFetching={isFetching}
+        onNext={() => nextPage(meta?.nextCursor)}
+        onPrevious={() => previousPage(meta?.previousCursor)}
+      />
     </div>
   );
 }

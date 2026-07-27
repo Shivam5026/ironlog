@@ -1,8 +1,8 @@
 import type { Exercise } from "../types/exercise";
 
 import ExerciseCard from "./ExerciseCard";
-import { CardSkeleton } from "@/shared/components/ui/CardSkeleton";
 
+import { CardSkeleton } from "@/shared/components/ui/CardSkeleton";
 import { EmptyState } from "@/shared/components/ui/EmptyState";
 import { ErrorState } from "@/shared/components/ui/ErrorState";
 
@@ -23,24 +23,45 @@ export default function SearchResults({
     return (
       <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {Array.from({ length: 8 }).map((_, index) => (
-          <CardSkeleton key={index} image showHeader={false} rows={2} />
+          <CardSkeleton
+            key={index}
+            image
+            showHeader={false}
+            rows={2}
+          />
         ))}
       </section>
     );
   }
 
   if (isError) {
-    return <ErrorState title="Unable to load exercises" description={error?.message} />;
+    return (
+      <ErrorState
+        title="Unable to load exercises"
+        description={
+          error?.message ??
+          "Something went wrong while loading the exercise library."
+        }
+      />
+    );
   }
 
   if (exercises.length === 0) {
-    return <EmptyState title="No exercises found" description="Try another search term." />;
+    return (
+      <EmptyState
+        title="No exercises found"
+        description="Try adjusting your search or filters."
+      />
+    );
   }
 
   return (
     <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {exercises.map((exercise) => (
-        <ExerciseCard key={exercise.exerciseId} exercise={exercise} />
+        <ExerciseCard
+          key={exercise.exerciseId}
+          exercise={exercise}
+        />
       ))}
     </section>
   );
