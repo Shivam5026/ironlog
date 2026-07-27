@@ -3,21 +3,30 @@ import { exerciseApi } from "./exerciseApi";
 import {
   BodyPartQuery,
   EquipmentsQuery,
+  ExerciseFilters,
   MusclesQuery,
 } from "./exercise.schemas";
 import { withCache } from "../../lib/cache";
 
+const CACHE_KEYS = {
+  BODY_PARTS: "exercise:bodyparts",
+  MUSCLES: "exercise:muscles",
+  EQUIPMENTS: "exercise:equipments",
+};
+
+const CACHE_TTL = 60 * 60 * 24; // 24 hours
+
 function handleExerciseApiError(error: unknown): never {
   if (axios.isAxiosError(error)) {
-    const msg =
+    const message =
       error.response?.data?.error?.message ??
       error.response?.data?.message ??
       error.message;
 
-    throw new Error(msg);
+    throw new Error(message);
   }
 
-  throw new Error("Unexpected error while fetching exercises.");
+  throw new Error("Unexpected error while communicating with ExerciseDB.");
 }
 
 async function get<T>(
@@ -25,57 +34,64 @@ async function get<T>(
   params?: Record<string, unknown>,
 ): Promise<T> {
   try {
-    const response = await exerciseApi.get(url, { params });
-    return response.data;
+    const { data } = await exerciseApi.get<T>(url, {
+      params,
+    });
+
+    return data;
   } catch (error) {
     handleExerciseApiError(error);
   }
 }
 
-function createCacheKey(prefix: string, params: Record<string, unknown>) {
-  const query = new URLSearchParams();
+export async function getExercises(filters: ExerciseFilters) {
+  const params: Record<string, unknown> = {};
 
-  Object.entries(params)
-    .filter(([, value]) => value !== undefined)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .forEach(([key, value]) => {
-      query.append(key, String(value));
-    });
+  if (filters.search) params.name = filters.search;
 
-  return `${prefix}:${query.toString()}`;
+  if (filters.bodyParts) params.bodyParts = filters.bodyParts;
+
+  if (filters.targetMuscles)
+    params.targetMuscles = filters.targetMuscles;
+
+  if (filters.equipments)
+    params.equipments = filters.equipments;
+
+  if (filters.limit) params.limit = filters.limit;
+
+  if ("after" in filters && filters.after)
+    params.after = filters.after;
+
+  if ("before" in filters && filters.before)
+    params.before = filters.before;
+
+  return get("/exercises", params);
 }
 
-export function getExercises() {
-  return withCache("exercise:all", () => get("/exercises"));
+export async function getExerciseById(id: string) {
+  return get(`/exercises/${id}`);
 }
 
-export function getExerciseById(id: string) {
-  return withCache(`exercise:id:${id}`, () => get(`/exercises/${id}`));
-}
-
-export function searchExercises(search: string, threshold = 0.5) {
-  return withCache(`exercise:search:${search}:${threshold}`, () =>
-    get("/exercises/search", {
-      search,
-      threshold,
-    }),
+export async function getBodyParts(query?: BodyPartQuery) {
+  return withCache(
+    CACHE_KEYS.BODY_PARTS,
+    () => get("/bodyparts", query),
+    CACHE_TTL,
   );
 }
 
-export function getExercisesByBodyPart(params: BodyPartQuery) {
-  const key = createCacheKey("exercise:bodypart", params);
-
-  return withCache(key, () => get("/exercises/bodyparts", params));
+export async function getTargetMuscles(query?: MusclesQuery) {
+  return withCache(
+    CACHE_KEYS.MUSCLES,
+    () => get("/muscles", query),
+    CACHE_TTL,
+  );
 }
 
-export function getExercisesByMuscles(params: MusclesQuery) {
-  const key = createCacheKey("exercise:muscles", params);
-
-  return withCache(key, () => get("/exercises/muscles", params));
-}
-
-export function getExercisesByEquipments(params: EquipmentsQuery) {
-  const key = createCacheKey("exercise:equipments", params);
-
-  return withCache(key, () => get("/exercises/equipments", params));
+export async function getEquipments(query?: EquipmentsQuery) {
+  return withCache(
+    CACHE_KEYS.EQUIPMENTS,
+    () => get("/equipments", query),
+    CACHE_TTL,
+  );
 }

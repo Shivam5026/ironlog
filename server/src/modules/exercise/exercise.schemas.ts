@@ -1,4 +1,4 @@
-import { Schema, z } from "zod";
+import { z } from "zod";
 import { cursorPaginationSchema } from "./pagination.schema";
 
 export const exerciseIdSchema = z.object({
@@ -42,3 +42,21 @@ export const equipmentSchema = cursorPaginationSchema.extend({
 });
 
 export type EquipmentsQuery = z.infer<typeof equipmentSchema>;
+
+export const exerciseFiltersSchema = z.object({
+  search: z.string().trim().optional(),
+
+  bodyParts: z.string().trim().optional(),
+
+  targetMuscles: z.string().trim().optional(),
+
+  equipments: z.string().trim().optional(),
+
+  limit: z.coerce.number().int().min(1).max(25).default(20),
+
+  after: z.string().optional(),
+
+  before: z.string().optional(),
+});
+
+export type ExerciseFilters = z.infer<typeof exerciseFiltersSchema>;

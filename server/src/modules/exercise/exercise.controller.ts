@@ -3,12 +3,10 @@ import type { Request, Response, NextFunction } from "express";
 import * as exerciseService from "./exerciseDb.service";
 
 import { ApiResponse } from "../../utils/ApiResponse";
+
 import {
-  bodyPartSchema,
-  equipmentSchema,
   ExerciseParams,
-  exerciseSearchSchema,
-  muscleSchema,
+  exerciseFiltersSchema,
 } from "./exercise.schemas";
 
 export async function getExercises(
@@ -17,11 +15,17 @@ export async function getExercises(
   next: NextFunction,
 ) {
   try {
-    const exercises = await exerciseService.getExercises();
+    const filters = exerciseFiltersSchema.parse(req.query);
 
-    return res
-      .status(200)
-      .json(new ApiResponse(200, exercises, "Exercises fetched successfully"));
+    const exercises = await exerciseService.getExercises(filters);
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        exercises,
+        "Exercises fetched successfully",
+      ),
+    );
   } catch (error) {
     next(error);
   }
@@ -37,73 +41,75 @@ export async function getExerciseById(
 
     const exercise = await exerciseService.getExerciseById(id);
 
-    return res
-      .status(200)
-      .json(new ApiResponse(200, exercise, "Exercise fetched successfully."));
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        exercise,
+        "Exercise fetched successfully",
+      ),
+    );
   } catch (error) {
     next(error);
   }
 }
 
-export async function searchExercises(
-  req: Request,
+export async function getBodyParts(
+  _req: Request,
   res: Response,
   next: NextFunction,
 ) {
   try {
-    const { search, threshold = 0.5 } = exerciseSearchSchema.parse(req.query);
+    const bodyParts = await exerciseService.getBodyParts();
 
-    const result = await exerciseService.searchExercises(search, threshold);
-
-    return res.status(200).json(result);
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        bodyParts,
+        "Body parts fetched successfully",
+      ),
+    );
   } catch (error) {
     next(error);
   }
 }
 
-export async function getExercisesByBodyPart(
-  req: Request,
+export async function getTargetMuscles(
+  _req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
-    const query = bodyPartSchema.parse(req.query);
+    const targetMuscles =
+      await exerciseService.getTargetMuscles();
 
-    const result = await exerciseService.getExercisesByBodyPart(query);
-
-    return res.status(200).json(result);
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        targetMuscles,
+        "Target muscles fetched successfully",
+      ),
+    );
   } catch (error) {
     next(error);
   }
 }
 
-export async function getExercisesByMuscles(
-  req: Request,
+export async function getEquipments(
+  _req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
-    const query = muscleSchema.parse(req.query);
+    const equipments =
+      await exerciseService.getEquipments();
 
-    const result = await exerciseService.getExercisesByMuscles(query);
-
-    return res.status(200).json(result);
-  } catch (error) {
-    next(error);
-  }
-}
-
-export async function getExercisesByEquipments(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  try {
-    const query = equipmentSchema.parse(req.query);
-
-    const result = await exerciseService.getExercisesByEquipments(query);
-
-    return res.status(200).json(result);
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        equipments,
+        "Equipments fetched successfully",
+      ),
+    );
   } catch (error) {
     next(error);
   }

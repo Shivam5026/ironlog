@@ -6,13 +6,11 @@ const router = Router();
 
 router.get("/", exerciseController.getExercises);
 
-router.get("/search", exerciseController.searchExercises);
+router.get("/body-parts", exerciseController.getBodyParts);
 
-router.get("/body-part", exerciseController.getExercisesByBodyPart);
+router.get("/target-muscles", exerciseController.getTargetMuscles);
 
-router.get("/muscles", exerciseController.getExercisesByMuscles);
-
-router.get("/equipments", exerciseController.getExercisesByEquipments);
+router.get("/equipments", exerciseController.getEquipments);
 
 router.get("/:id", exerciseController.getExerciseById);
 
