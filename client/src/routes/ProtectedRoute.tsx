@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 
 import { useAuth } from "@/shared/hooks/useAuth";
-import FullPageLoader from "@/shared/components/common/FullPageLoader";
+import {FullPageLoader} from "@/shared/components/ui";
 
 export default function ProtectedRoute() {
   const { data, isPending } = useAuth();

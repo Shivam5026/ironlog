@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 
 import { useAuth } from "@/shared/hooks/useAuth";
-import { FullPageLoader } from "../common/FullPageLoader";
+import { FullPageLoader } from "../ui/FullPageLoader";
 
 export default function GuestRoute() {
   const { data: session, isPending } = useAuth();

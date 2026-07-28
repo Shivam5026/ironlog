@@ -8,7 +8,7 @@ import { Input } from "@/shared/components/ui/Input";
 import { Label } from "@/shared/components/ui/Label";
 import { PasswordInput } from "@/shared/components/ui/PasswordInput";
 
-import { Spinner } from "@/shared/components/common/Spinner";
+import { Spinner } from "@/shared/components/ui/Spinner";
 import { getErrorMessage } from "@/shared/lib/errors";
 
 import { useRegister } from "../hooks";

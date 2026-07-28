@@ -9,19 +9,35 @@ export interface Exercise {
   instructions: string[];
 }
 
+export interface ExerciseListMeta {
+  total: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  nextCursor?: string;
+  previousCursor?: string;
+}
+
 export interface ExerciseListResponse {
+  meta: ExerciseListMeta;
+  data: Exercise[];
+}
+
+export interface ApiResponse<T> {
   success: boolean;
+  statusCode: number;
   message: string;
-  data: {
-    meta: {
-      total: number;
-      hasNextPage: boolean;
-      hasPreviousPage: boolean;
-      nextCursor?: string;
-      previousCursor?: string;
-    };
-    data: Exercise[];
-  };
+  data: T;
+}
+
+export interface ExercisePayload {
+  success: boolean;
+  data: Exercise;
+}
+
+export interface ExerciseListPayload {
+  success: boolean;
+  meta: ExerciseListMeta;
+  data: Exercise[];
 }
 
 export interface ExerciseLibraryFilters {

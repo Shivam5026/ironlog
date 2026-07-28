@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 import { useAuth } from "@/shared/hooks/useAuth";
-import { FullPageLoader } from "../common/FullPageLoader";
+import { FullPageLoader } from "../ui/FullPageLoader";
 
 export default function ProtectedRoute() {
   const { data: session, isPending } = useAuth();

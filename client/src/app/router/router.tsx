@@ -13,11 +13,11 @@ import RegisterPage from "@/pages/RegisterPage";
 import DashboardPage from "@/pages/DashboardPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 
-import {ProfilePage} from "@/features/profile/page/ProfilePage";
+import { ProfilePage } from "@/features/profile/page/ProfilePage";
 import ExerciseLibrary from "@/features/exercise/pages/ExerciseLibrary";
+import ExerciseDetails from "@/features/exercise/pages/ExerciseDetails";
 
 export const router = createBrowserRouter([
-  // Public
   {
     element: <RootLayout />,
     children: [
@@ -28,7 +28,6 @@ export const router = createBrowserRouter([
     ],
   },
 
-  // Guest-only routes
   {
     element: <GuestRoute />,
     children: [
@@ -48,32 +47,41 @@ export const router = createBrowserRouter([
     ],
   },
 
-  // Protected routes
   {
-  element: <ProtectedRoute />,
-  children: [
-    {
-      path: "/dashboard",
-      element: <DashboardLayout />,
-      children: [
-        {
-          index: true,
-          element: <DashboardPage />,
-        },
-        {
-          path: "profile",
-          element: <ProfilePage />,
-        },
-        {
-          path: "exercises",
-          element: <ExerciseLibrary />,
-        }
-      ],
-    },
-  ],
-},
-{
-  path: "*",
-  element: <NotFoundPage />,
-}
-])
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: "/dashboard",
+        element: <DashboardLayout />,
+        children: [
+          {
+            index: true,
+            element: <DashboardPage />,
+          },
+          {
+            path: "profile",
+            element: <ProfilePage />,
+          },
+          {
+            path: "exercises",
+            children: [
+              {
+                index: true,
+                element: <ExerciseLibrary />,
+              },
+              {
+                path: ":exerciseId",
+                element: <ExerciseDetails />,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+
+  {
+    path: "*",
+    element: <NotFoundPage />,
+  },
+]);

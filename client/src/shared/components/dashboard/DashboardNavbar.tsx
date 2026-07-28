@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 
 import { Button } from "@/shared/components/ui/Button";
-import { Spinner } from "@/shared/components/common/Spinner";
+import { Spinner } from "@/shared/components/ui/Spinner";
 
 import { dashboardNavigation } from "@/shared/config/dashboardNavigation";
 

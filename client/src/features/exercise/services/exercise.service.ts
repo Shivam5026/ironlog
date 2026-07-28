@@ -1,52 +1,79 @@
 import { api } from "./api";
 import type { Exercise, ExerciseListResponse } from "../types/exercise";
 
+interface ApiResponse<T> {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: T;
+}
+
+interface ExerciseListPayload {
+  success: boolean;
+  meta: ExerciseListResponse["meta"];
+  data: Exercise[];
+}
+
+interface ExercisePayload {
+  success: boolean;
+  data: Exercise;
+}
+
 export interface GetExercisesParams {
-  search: string;
-  bodyParts: string;
-  targetMuscles: string;
-  equipments: string;
-  limit: number;
+  search?: string;
+  bodyParts?: string;
+  targetMuscles?: string;
+  equipments?: string;
+  limit?: number;
   after?: string;
   before?: string;
 }
 
 export async function getExercises(
-  params: GetExercisesParams = {
-    search: "",
-    bodyParts: "",
-    targetMuscles: "",
-    equipments: "",
-    limit: 20,
-  },
+  params: GetExercisesParams = { limit: 20 },
 ): Promise<ExerciseListResponse> {
-  const { data } = await api.get<ExerciseListResponse>("/exercises", {
-    params,
+  const cleanedParams = Object.fromEntries(
+    Object.entries(params).filter(([, value]) => value !== "" && value !== undefined),
+  );
+
+  const { data } = await api.get<ApiResponse<ExerciseListPayload>>("/exercises", {
+    params: cleanedParams,
   });
 
-  return data;
+  return {
+    meta: data.data.meta,
+    data: data.data.data,
+  };
 }
 
 export async function getExerciseById(exerciseId: string): Promise<Exercise> {
-  const { data } = await api.get<Exercise>(`/exercises/${exerciseId}`);
+  const { data } = await api.get<ApiResponse<ExercisePayload>>(
+  `/exercises/${exerciseId}`,
+);
 
-  return data;
+return data.data.data;
+}
+
+interface LookupPayload {
+  success: boolean;
+  data: string[];
 }
 
 export async function getBodyParts(): Promise<string[]> {
-  const { data } = await api.get<string[]>("/body-parts");
+  const { data } = await api.get<ApiResponse<LookupPayload>>("/body-parts");
 
-  return data;
+  return data.data.data;
 }
 
 export async function getTargetMuscles(): Promise<string[]> {
-  const { data } = await api.get<string[]>("/target-muscles");
+  const { data } = await api.get<ApiResponse<LookupPayload>>("/target-muscles");
 
-  return data;
+  return data.data.data;
 }
 
-export async function getEquipments(): Promise<string[]> {
-  const { data } = await api.get<string[]>("/equipments");
 
-  return data;
+export async function getEquipments(): Promise<string[]> {
+  const { data } = await api.get<ApiResponse<LookupPayload>>("/equipments");
+
+  return data.data.data;
 }

@@ -27,7 +27,10 @@ function TagList({
   return (
     <>
       {items.map((item) => (
-        <span key={item} className={`rounded-full px-3 py-1 text-xs ${colors[variant]}`}>
+        <span
+          key={item}
+          className={`rounded-full px-3 py-1 text-xs ${colors[variant]}`}
+        >
           {item}
         </span>
       ))}
@@ -40,7 +43,7 @@ export default function ExerciseCard({ exercise }: ExerciseCardProps) {
 
   return (
     <Link
-      to={`/exercises/${exercise.exerciseId}`}
+      to={`/dashboard/exercises/${exercise.exerciseId}`}
       className="group block rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-950"
     >
       <Card className="gap-0 transition-all duration-300 hover:-translate-y-1 hover:ring-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/10">
@@ -59,7 +62,9 @@ export default function ExerciseCard({ exercise }: ExerciseCardProps) {
         )}
 
         <CardContent className="space-y-4">
-          <CardTitle className="text-lg font-semibold capitalize">{exercise.name}</CardTitle>
+          <CardTitle className="text-lg font-semibold capitalize">
+            {exercise.name}
+          </CardTitle>
 
           <div className="flex flex-wrap gap-2">
             <TagList items={exercise.bodyParts} variant="emerald" />
@@ -67,7 +72,9 @@ export default function ExerciseCard({ exercise }: ExerciseCardProps) {
             <TagList items={exercise.equipments} variant="orange" />
           </div>
 
-          <div className="pt-2 text-sm font-medium text-emerald-400">View Details →</div>
+          <div className="pt-2 text-sm font-medium text-emerald-400">
+            View Details →
+          </div>
         </CardContent>
       </Card>
     </Link>

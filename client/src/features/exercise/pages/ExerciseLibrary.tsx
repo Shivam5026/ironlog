@@ -10,9 +10,14 @@ import { useBodyParts } from "../hooks/useBodyParts";
 import { useTargetMuscles } from "../hooks/useTargetMuscles";
 import { useEquipments } from "../hooks/useEquipments";
 import { useExerciseFilters } from "../hooks/useExerciseFilters";
+import { Spinner } from "@/shared/components/ui/Spinner";
 
 export default function ExerciseLibrary() {
   const { filters, updateFilters, resetFilters, nextPage, previousPage } = useExerciseFilters();
+
+  const bodyPartsQuery = useBodyParts();
+  const targetMusclesQuery = useTargetMuscles();
+  const equipmentsQuery = useEquipments();
 
   const debouncedSearch = useDebounce(filters.search, 300);
 
@@ -21,19 +26,15 @@ export default function ExerciseLibrary() {
     search: debouncedSearch,
   });
 
-  const exercises = data?.data.data ?? [];
-  const meta = data?.data.meta;
+  const exercises = data?.data ?? [];
+  const meta = data?.meta;
+  const hasActiveFilters =
+    Boolean(filters.bodyParts) || Boolean(filters.targetMuscles) || Boolean(filters.equipments);
 
   function handleFilterChange(field: keyof typeof filters, value: string) {
     updateFilters({
       [field]: value,
-      after: undefined,
-      before: undefined,
     });
-  }
-
-  function handleResetFilters() {
-    resetFilters();
   }
 
   return (
@@ -46,63 +47,65 @@ export default function ExerciseLibrary() {
         </p>
       </header>
 
-      <SearchBar
-        value={filters.search}
-        onChange={(value) =>
-          updateFilters({
-            search: value,
-          })
-        }
-      />
+      <SearchBar value={filters.search} onChange={(value) => handleFilterChange("search", value)} />
 
       <FilterBar
         filters={filters}
-        bodyParts={useBodyParts().data ?? []}
-        targetMuscles={useTargetMuscles().data ?? []}
-        equipments={useEquipments().data ?? []}
+        bodyParts={bodyPartsQuery.data ?? []}
+        targetMuscles={targetMusclesQuery.data ?? []}
+        equipments={equipmentsQuery.data ?? []}
         onChange={handleFilterChange}
-        onReset={handleResetFilters}
+        onReset={resetFilters}
       />
 
-      <div className="flex flex-wrap gap-2">
-        {filters.bodyParts && (
-          <FilterChip
-            label="Body"
-            value={filters.bodyParts}
-            onRemove={() => handleFilterChange("bodyParts", "")}
-          />
-        )}
+      {hasActiveFilters && (
+        <div className="flex flex-wrap gap-2">
+          {filters.bodyParts && (
+            <FilterChip
+              label="Body"
+              value={filters.bodyParts}
+              onRemove={() => handleFilterChange("bodyParts", "")}
+            />
+          )}
 
-        {filters.targetMuscles && (
-          <FilterChip
-            label="Muscle"
-            value={filters.targetMuscles}
-            onRemove={() => handleFilterChange("targetMuscles", "")}
-          />
-        )}
+          {filters.targetMuscles && (
+            <FilterChip
+              label="Muscle"
+              value={filters.targetMuscles}
+              onRemove={() => handleFilterChange("targetMuscles", "")}
+            />
+          )}
 
-        {filters.equipments && (
-          <FilterChip
-            label="Equipment"
-            value={filters.equipments}
-            onRemove={() => handleFilterChange("equipments", "")}
-          />
-        )}
-      </div>
+          {filters.equipments && (
+            <FilterChip
+              label="Equipment"
+              value={filters.equipments}
+              onRemove={() => handleFilterChange("equipments", "")}
+            />
+          )}
+        </div>
+      )}
 
-      {isFetching && !isPending && <p className="text-sm text-slate-400">Updating exercises...</p>}
+      {isFetching && !isPending && (
+        <div className="flex items-center gap-2 text-sm text-slate-400">
+          <Spinner />
+          <span>Updating exercises...</span>
+        </div>
+      )}
 
       <p className="text-sm text-slate-400">{meta?.total ?? 0} exercises found</p>
 
       <SearchResults exercises={exercises} isPending={isPending} isError={isError} error={error} />
 
-      <Pagination
-        hasNextPage={meta?.hasNextPage ?? false}
-        hasPreviousPage={meta?.hasPreviousPage ?? false}
-        isFetching={isFetching}
-        onNext={() => nextPage(meta?.nextCursor)}
-        onPrevious={() => previousPage(meta?.previousCursor)}
-      />
+      {(meta?.hasNextPage || meta?.hasPreviousPage) && (
+        <Pagination
+          hasNextPage={meta?.hasNextPage ?? false}
+          hasPreviousPage={meta?.hasPreviousPage ?? false}
+          isFetching={isFetching}
+          onNext={() => nextPage(meta?.nextCursor)}
+          onPrevious={() => previousPage(meta?.previousCursor)}
+        />
+      )}
     </div>
   );
 }

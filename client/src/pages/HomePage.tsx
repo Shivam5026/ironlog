@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 import { Button } from "@/shared/components/ui/Button";
 import { useAuth } from "@/shared/hooks/useAuth";
-import { FullPageLoader } from "@/shared/components/common/FullPageLoader";
+import { FullPageLoader } from "@/shared/components/ui/FullPageLoader";
 
 export default function HomePage() {
   const { data: session, isPending } = useAuth();

@@ -11,7 +11,7 @@ export default function FilterSelect({
   id,
   label,
   value,
-  options,
+  options = [],
   placeholder = "All",
   onChange,
 }: FilterSelectProps) {
@@ -33,7 +33,11 @@ export default function FilterSelect({
         <option value="">{placeholder}</option>
 
         {options.map((option) => (
-          <option key={option} value={option}>
+          <option
+            key={option}
+            value={option}
+            className="capitalize"
+          >
             {option}
           </option>
         ))}

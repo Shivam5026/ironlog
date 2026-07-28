@@ -1,11 +1,12 @@
 import FilterSelect from "./FilterSelect";
 import ClearFiltersButton from "./ClearFiltersButton";
-import type { GetExercisesParams } from "../services/exercise.service";
 
-type FilterBarFilters = Pick<
-  GetExercisesParams,
-  "search" | "bodyParts" | "targetMuscles" | "equipments"
->;
+interface FilterBarFilters {
+  search: string;
+  bodyParts: string;
+  targetMuscles: string;
+  equipments: string;
+}
 
 interface FilterBarProps {
   filters: FilterBarFilters;

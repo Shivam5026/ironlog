@@ -1,4 +1,4 @@
-import { Spinner } from "./Spinner";
+import { Spinner } from "../ui/Spinner";
 
 export function FullPageLoader() {
   return (
