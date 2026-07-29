@@ -24,7 +24,7 @@ export function FormField({
     <div className={cn("space-y-2", className)}>
       <label
         htmlFor={htmlFor}
-        className="block text-sm font-medium text-slate-200"
+        className="block text-sm font-medium text-foreground"
       >
         {label}
 
@@ -43,7 +43,7 @@ export function FormField({
           {error}
         </p>
       ) : helperText ? (
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-muted-foreground">
           {helperText}
         </p>
       ) : null}

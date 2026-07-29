@@ -42,7 +42,7 @@ export default function ExerciseLibrary() {
       <header>
         <h1 className="text-4xl font-bold">Exercise Library</h1>
 
-        <p className="mt-2 text-slate-400">
+        <p className="mt-2 text-muted-foreground">
           Discover exercises, filter by muscle group, equipment and body part.
         </p>
       </header>
@@ -87,13 +87,13 @@ export default function ExerciseLibrary() {
       )}
 
       {isFetching && !isPending && (
-        <div className="flex items-center gap-2 text-sm text-slate-400">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Spinner />
           <span>Updating exercises...</span>
         </div>
       )}
 
-      <p className="text-sm text-slate-400">{meta?.total ?? 0} exercises found</p>
+      <p className="text-sm text-muted-foreground">{meta?.total ?? 0} exercises found</p>
 
       <SearchResults exercises={exercises} isPending={isPending} isError={isError} error={error} />
 

@@ -1,31 +1,55 @@
-import { Dumbbell } from "lucide-react";
+import { Dumbbell, type LucideIcon } from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/shared/components/ui/Card";
+import { Badge } from "@/shared/components/ui/Badge";
+import { Separator } from "@/shared/components/ui/Separator";
 
 interface InfoListCardProps {
   title: string;
-  values: string[];
+  values?: string[];
+  icon?: LucideIcon;
 }
 
 export function InfoListCard({
   title,
-  values,
+  values = [],
+  icon: Icon = Dumbbell,
 }: InfoListCardProps) {
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900 p-4">
-      <p className="text-xs uppercase tracking-wide text-slate-500">
-        {title}
-      </p>
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base font-semibold">
+          {title}
+        </CardTitle>
 
-      <div className="mt-3 flex flex-wrap gap-2">
-        {values.map((value) => (
-          <span
-            key={value}
-            className="inline-flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1 text-sm capitalize"
-          >
-            <Dumbbell size={14} />
-            {value}
-          </span>
-        ))}
-      </div>
-    </div>
+        <Separator />
+      </CardHeader>
+
+      <CardContent>
+        {values.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {values.map((value) => (
+              <Badge
+                key={value}
+                variant="secondary"
+                className="flex items-center gap-2 px-3 py-1 capitalize"
+              >
+                <Icon className="h-3.5 w-3.5" />
+                {value}
+              </Badge>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            No information available.
+          </p>
+        )}
+      </CardContent>
+    </Card>
   );
 }

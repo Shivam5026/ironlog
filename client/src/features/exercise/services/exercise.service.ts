@@ -1,4 +1,4 @@
-import { api } from "./api";
+import { api } from "@/shared/lib/axios";
 import type { Exercise, ExerciseListResponse } from "../types/exercise";
 
 interface ApiResponse<T> {
@@ -54,26 +54,29 @@ export async function getExerciseById(exerciseId: string): Promise<Exercise> {
 return data.data.data;
 }
 
+interface LookupItem {
+  name: string;
+}
+
 interface LookupPayload {
   success: boolean;
-  data: string[];
+  data: LookupItem[];
 }
 
 export async function getBodyParts(): Promise<string[]> {
-  const { data } = await api.get<ApiResponse<LookupPayload>>("/body-parts");
+  const { data } = await api.get<ApiResponse<LookupPayload>>("/exercises/body-parts");
 
-  return data.data.data;
+  return data.data.data.map((item) => item.name);
 }
 
 export async function getTargetMuscles(): Promise<string[]> {
-  const { data } = await api.get<ApiResponse<LookupPayload>>("/target-muscles");
+  const { data } = await api.get<ApiResponse<LookupPayload>>("/exercises/target-muscles");
 
-  return data.data.data;
+  return data.data.data.map((item) => item.name);
 }
 
-
 export async function getEquipments(): Promise<string[]> {
-  const { data } = await api.get<ApiResponse<LookupPayload>>("/equipments");
+  const { data } = await api.get<ApiResponse<LookupPayload>>("/exercises/equipments");
 
-  return data.data.data;
+  return data.data.data.map((item) => item.name);
 }

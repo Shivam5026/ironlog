@@ -1,3 +1,4 @@
+import { Card } from "@/shared/components/ui/Card";
 import FilterSelect from "./FilterSelect";
 import ClearFiltersButton from "./ClearFiltersButton";
 
@@ -26,7 +27,7 @@ export default function FilterBar({
   onReset,
 }: FilterBarProps) {
   return (
-    <section className="grid gap-4 rounded-2xl border border-slate-800 bg-slate-900/40 p-6 md:grid-cols-2 xl:grid-cols-4">
+    <Card className="grid gap-4 rounded-2xl border-border bg-muted/40 p-6 md:grid-cols-2 xl:grid-cols-4">
       <FilterSelect
         id="body-parts"
         label="Body Part"
@@ -54,6 +55,6 @@ export default function FilterBar({
       <div className="flex items-end">
         <ClearFiltersButton onClick={onReset} />
       </div>
-    </section>
+    </Card>
   );
 }

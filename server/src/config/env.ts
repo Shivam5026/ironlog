@@ -17,8 +17,6 @@ export const env = {
 
   BETTER_AUTH_URL: process.env.BETTER_AUTH_URL || "",
 
-  EXERCISE_DB_API_KEY: process.env.EXERCISE_DB_API_KEY || "",
-
   CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || "",
 
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || "",

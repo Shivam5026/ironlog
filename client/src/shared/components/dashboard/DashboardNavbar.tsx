@@ -11,6 +11,7 @@ import { getErrorMessage } from "@/shared/lib/errors";
 import { useLogout } from "@/features/auth/hooks";
 
 import { Menu } from "lucide-react";
+import ThemeToggle from "../theme/ThemeToggle";
 
 interface DashboardNavbarProps {
   onMenuClick: () => void;
@@ -61,12 +62,15 @@ export function DashboardNavbar({ onMenuClick }: DashboardNavbarProps) {
           <p className="text-sm text-muted-foreground">{currentPage.description}</p>
         </div>
       </div>
+      <div className="flex items-center gap-3">
+        <ThemeToggle />
 
-      <Button variant="outline" onClick={handleLogout} disabled={logout.isPending}>
-        {logout.isPending && <Spinner className="mr-2" />}
+        <Button variant="outline" onClick={handleLogout} disabled={logout.isPending}>
+          {logout.isPending && <Spinner className="mr-2" />}
 
-        {logout.isPending ? "Signing out..." : "Logout"}
-      </Button>
+          {logout.isPending ? "Signing out..." : "Logout"}
+        </Button>
+      </div>
     </header>
   );
 }

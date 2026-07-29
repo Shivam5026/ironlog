@@ -1,6 +1,5 @@
 import { useParams, Navigate } from "react-router-dom";
 import { useExercise } from "@/features/exercise/hooks/useExercise";
-import { FullPageLoader } from "@/shared/components/ui/FullPageLoader";
 import { ErrorState } from "@/shared/components/ui";
 import { EmptyState } from "@/shared/components/ui";
 
@@ -8,6 +7,7 @@ import ExerciseHero from "@/features/exercise/components/ExerciseHero";
 import ExerciseImage from "@/features/exercise/components/ExerciseImage";
 import ExerciseMetadata from "@/features/exercise/components/ExerciseMetadata";
 import ExerciseInstructions from "@/features/exercise/components/ExerciseInstructions";
+import { ExerciseDetailSkeleton } from "@/features/exercise/components/ExerciseDetailSkeleton";
 
 export default function ExerciseDetails() {
   const { exerciseId } = useParams();
@@ -19,7 +19,7 @@ export default function ExerciseDetails() {
   const { data: exercise, isPending, isError, error } = useExercise(exerciseId);
 
   if (isPending) {
-    return <FullPageLoader />;
+    return <ExerciseDetailSkeleton />;
   }
 
   if (isError) {

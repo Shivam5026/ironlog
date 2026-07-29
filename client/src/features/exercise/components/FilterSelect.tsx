@@ -19,7 +19,7 @@ export default function FilterSelect({
     <div className="flex flex-col gap-2">
       <label
         htmlFor={id}
-        className="text-sm font-medium text-slate-300"
+        className="text-sm font-medium text-muted-foreground"
       >
         {label}
       </label>
@@ -28,7 +28,7 @@ export default function FilterSelect({
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none transition-colors focus:border-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
+        className="rounded-xl border border-border bg-muted px-4 py-3 text-foreground outline-none transition-colors focus:border-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
       >
         <option value="">{placeholder}</option>
 

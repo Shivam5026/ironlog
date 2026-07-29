@@ -7,7 +7,7 @@ import { DashboardSidebar } from "@/shared/components/dashboard/DashboardSidebar
 import {
   Sheet,
   SheetContent,
-} from "@/shared/components/ui/sheet";
+} from "@/shared/components/ui/Sheet";
 
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);

@@ -1,33 +1,43 @@
 import { ArrowLeft } from "lucide-react";
-
-import { Button } from "@/shared/components/ui";
 import { useNavigate } from "react-router-dom";
+
+import { Button } from "@/shared/components/ui/Button";
+import { Separator } from "@/shared/components/ui/Separator";
 
 interface ExerciseHeroProps {
   name: string;
 }
 
-export default function ExerciseHero({ name }: ExerciseHeroProps) {
+export default function ExerciseHero({
+  name,
+}: ExerciseHeroProps) {
   const navigate = useNavigate();
+
   return (
-    <header className="space-y-4">
+    <header className="space-y-6">
       <Button
         type="button"
         variant="ghost"
         onClick={() => navigate("/dashboard/exercises")}
-        className="inline-flex items-center gap-2"
+        className="w-fit gap-2 text-muted-foreground transition-colors hover:text-foreground"
       >
-        <ArrowLeft size={18} />
-        Back
+        <ArrowLeft className="h-4 w-4" />
+        Back to Exercises
       </Button>
 
-      <div>
-        <h1 className="text-4xl font-bold capitalize">{name}</h1>
+      <div className="space-y-3">
+        <h1 className="text-3xl font-bold capitalize tracking-tight sm:text-4xl lg:text-5xl">
+          {name}
+        </h1>
 
-        <p className="mt-2 text-slate-400">
-          Learn the correct form, muscles worked and exercise instructions.
+        <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+          Learn the correct technique, discover the muscles worked, and follow
+          step-by-step instructions to perform this exercise safely and
+          effectively.
         </p>
       </div>
+
+      <Separator />
     </header>
   );
 }

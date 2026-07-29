@@ -10,11 +10,6 @@ async function bootstrap() {
 
     console.log("✅ PostgreSQL Connected");
 
-    app.get("/test", async (_req, res) => {
-      const users = await prisma.user.findMany();
-
-      res.json(users);
-    });
     await connectRedis();
     app.listen(PORT, () => {
       console.log(`🚀 Server started on ${PORT}`);

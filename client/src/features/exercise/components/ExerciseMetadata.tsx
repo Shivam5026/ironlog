@@ -1,4 +1,10 @@
 import { InfoListCard } from "./InfoListCard";
+import {
+  Activity,
+  Dumbbell,
+  Target,
+  User,
+} from "lucide-react";
 
 interface ExerciseMetadataProps {
   bodyParts: string[];
@@ -14,14 +20,33 @@ export default function ExerciseMetadata({
   secondaryMuscles,
 }: ExerciseMetadataProps) {
   return (
-    <div className="grid gap-5">
-      <InfoListCard title="Body Parts" values={bodyParts} />
+    <section
+      aria-label="Exercise metadata"
+      className="grid gap-5 lg:gap-6"
+    >
+      <InfoListCard
+        title="Body Parts"
+        values={bodyParts}
+        icon={User}
+      />
 
-      <InfoListCard title="Target Muscles" values={targetMuscles} />
+      <InfoListCard
+        title="Target Muscles"
+        values={targetMuscles}
+        icon={Target} 
+      />
 
-      <InfoListCard title="Equipment" values={equipments} />
+      <InfoListCard
+        title="Equipment"
+        values={equipments}
+        icon={Dumbbell}
+      />
 
-      <InfoListCard title="Secondary Muscles" values={secondaryMuscles} />
-    </div>
+      <InfoListCard
+        title="Secondary Muscles"
+        values={secondaryMuscles}
+        icon={Activity}
+      />
+    </section>
   );
 }

@@ -1,3 +1,5 @@
+import { Badge } from "@/shared/components/ui/Badge";
+
 interface FilterChipProps {
   label: string;
   value: string;
@@ -10,11 +12,13 @@ export default function FilterChip({
   onRemove,
 }: FilterChipProps) {
   return (
-    <button
+    <Badge
+      variant="secondary"
+      render={<button />}
       onClick={onRemove}
-      className="rounded-full bg-emerald-500/15 px-3 py-1 text-sm text-emerald-400 transition hover:bg-red-500/15 hover:text-red-400"
+      className="bg-emerald-500/15 text-emerald-400 hover:bg-red-500/15 hover:text-red-400"
     >
       {label}: {value} ✕
-    </button>
+    </Badge>
   );
 }
