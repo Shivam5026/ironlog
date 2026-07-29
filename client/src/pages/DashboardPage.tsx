@@ -1,4 +1,5 @@
 import { Plus, Dumbbell } from "lucide-react";
+import { Link } from "react-router-dom";
 import { EmptyState } from "@/shared/components/ui/EmptyState";
 import { Button } from "@/shared/components/ui/Button";
 
@@ -14,10 +15,12 @@ export default function DashboardPage() {
         title="No workouts yet"
         description="Create your first workout to get started."
         action={
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Create Workout
-          </Button>
+          <Link to="/dashboard/workout-plans">
+            <Button>
+              <Plus className="h-4 w-4" />
+              Create Workout
+            </Button>
+          </Link>
         }
       />
     </section>
