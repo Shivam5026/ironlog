@@ -1,5 +1,4 @@
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
@@ -8,37 +7,45 @@ import { Button } from "@/shared/components/ui/Button";
 import { FormField } from "@/shared/components/ui/FormField";
 import { Input } from "@/shared/components/ui/Input";
 import { useCreateWorkoutPlan } from "../hooks/useCreateWorkoutPlan";
+import { useUpdateWorkoutPlan } from "../hooks/useUpdateWorkoutPlan";
+import type { WorkoutPlan } from "../types";
 
-const createPlanSchema = z.object({
+const planSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),
   description: z.string().trim().max(500).optional(),
 });
 
-type FormValues = z.infer<typeof createPlanSchema>;
+type FormValues = z.infer<typeof planSchema>;
 
 interface WorkoutPlanFormProps {
+  plan?: WorkoutPlan;
   onSuccess?: () => void;
 }
 
-export default function WorkoutPlanForm({ onSuccess }: WorkoutPlanFormProps) {
-  const navigate = useNavigate();
+export default function WorkoutPlanForm({ plan, onSuccess }: WorkoutPlanFormProps) {
   const createPlan = useCreateWorkoutPlan();
+  const updatePlan = useUpdateWorkoutPlan();
+  const isEdit = !!plan;
 
   const {
     register,
     handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<FormValues>({
-    resolver: zodResolver(createPlanSchema),
+    resolver: zodResolver(planSchema),
+    defaultValues: plan ? { name: plan.name, description: plan.description ?? "" } : undefined,
   });
 
   const onSubmit = async (data: FormValues) => {
-    await createPlan.mutateAsync(data);
-    reset();
+    if (plan) {
+      await updatePlan.mutateAsync({ id: plan.id, payload: data });
+    } else {
+      await createPlan.mutateAsync(data);
+    }
     onSuccess?.();
-    navigate("/dashboard/workout-plans");
   };
+
+  const saving = createPlan.isPending || updatePlan.isPending;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -72,16 +79,16 @@ export default function WorkoutPlanForm({ onSuccess }: WorkoutPlanFormProps) {
 
       <Button
         type="submit"
-        disabled={isSubmitting}
+        disabled={saving}
         className="w-full"
       >
-        {isSubmitting ? (
+        {saving ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
-            Creating...
+            {isEdit ? "Saving..." : "Creating..."}
           </>
         ) : (
-          "Create"
+          isEdit ? "Save" : "Create"
         )}
       </Button>
     </form>

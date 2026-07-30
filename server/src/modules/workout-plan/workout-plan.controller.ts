@@ -84,6 +84,22 @@ export async function updatePlan(req: Request, res: Response, next: NextFunction
   }
 }
 
+export async function duplicatePlan(req: Request, res: Response, next: NextFunction) {
+  try {
+    const userId = req.session?.userId;
+    if (!userId) {
+      throw new ApiError(401, "Unauthorized");
+    }
+
+    const { id } = planIdSchema.parse(req.params);
+    const plan = await workoutPlanService.duplicatePlan(id, userId);
+
+    return res.status(201).json(new ApiResponse(201, plan, "Plan duplicated"));
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function deletePlan(req: Request, res: Response, next: NextFunction) {
   try {
     const userId = req.session?.userId;

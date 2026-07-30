@@ -10,8 +10,9 @@ router.get("/", workoutPlanController.getPlans);
 router.post("/", workoutPlanController.createPlan);
 
 router.get("/:id", workoutPlanController.getPlanById);
-router.patch("/:id", workoutPlanController.updatePlan);
+router.put("/:id", workoutPlanController.updatePlan);
 router.delete("/:id", workoutPlanController.deletePlan);
+router.post("/:id/duplicate", workoutPlanController.duplicatePlan);
 
 router.post("/:id/days", workoutPlanController.addDay);
 router.delete("/:id/days/:dayId", workoutPlanController.removeDay);

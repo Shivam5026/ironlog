@@ -17,7 +17,9 @@ import { ProfilePage } from "@/features/profile/page/ProfilePage";
 import ExerciseLibrary from "@/features/exercise/pages/ExerciseLibrary";
 import ExerciseDetails from "@/features/exercise/pages/ExerciseDetails";
 import CreateWorkoutPlanPage from "@/features/workout-plans/pages/CreateWorkoutPlanPage";
+import EditWorkoutPlanPage from "@/features/workout-plans/pages/EditWorkoutPlanPage";
 import WorkoutPlansPage from "@/features/workout-plans/pages/WorkoutPlansPage";
+import WorkoutPlanDetailsPage from "@/features/workout-plans/pages/WorkoutPlanDetailsPage";
 
 export const router = createBrowserRouter([
   {
@@ -66,7 +68,24 @@ export const router = createBrowserRouter([
           },
           {
             path: "workout-plans",
-            element: <WorkoutPlansPage />,
+            children: [
+              {
+                index: true,
+                element: <WorkoutPlansPage />,
+              },
+              {
+                path: "new",
+                element: <CreateWorkoutPlanPage />,
+              },
+              {
+                path: ":planId",
+                element: <WorkoutPlanDetailsPage />,
+              },
+              {
+                path: ":planId/edit",
+                element: <EditWorkoutPlanPage />,
+              },
+            ],
           },
           {
             path: "exercises",

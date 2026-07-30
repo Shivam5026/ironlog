@@ -15,6 +15,7 @@ import { notFound } from "./middlewares/notFound";
 import profileRouter from "./modules/profile/profile.route";
 import exerciseRoutes from "./modules/exercise/exercise.routes";
 import { workoutPlanRouter } from "./modules/workout-plan";
+import { workoutDayRouter } from "./modules/workout-day";
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/profile", profileRouter);
 app.use("/api/exercises", exerciseRoutes);
 app.use("/api/workout-plans", workoutPlanRouter);
+app.use("/api/workout-days", workoutDayRouter);
 
 app.use(notFound);
 

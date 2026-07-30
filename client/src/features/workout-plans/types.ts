@@ -3,6 +3,11 @@ export type CreateWorkoutPlanPayload = {
   description?: string;
 };
 
+export type UpdateWorkoutPlanPayload = {
+  name?: string;
+  description?: string;
+};
+
 export type WorkoutPlan = {
   id: string;
   userId: string;

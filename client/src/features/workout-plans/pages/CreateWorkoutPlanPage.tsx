@@ -1,16 +1,20 @@
-import WorkoutPlanDialog from "../components/WorkoutPlanDialog";
+import { useNavigate } from "react-router-dom";
+
+import { WorkoutPlanHeader } from "../components/WorkoutPlanHeader";
+import WorkoutPlanForm from "../components/WorkoutPlanForm";
 
 export default function CreateWorkoutPlanPage() {
-  return (
-    <div className="mx-auto max-w-7xl space-y-8 px-6 py-10">
-      <header>
-        <h1 className="text-4xl font-bold">Workout Plans</h1>
-        <p className="mt-2 text-muted-foreground">
-          Create and manage your training routines.
-        </p>
-      </header>
+  const navigate = useNavigate();
 
-      <WorkoutPlanDialog />
+  return (
+    <div className="mx-auto max-w-2xl space-y-8">
+      <WorkoutPlanHeader
+        title="Create Workout Plan"
+        description="Set up a new training routine."
+        backLink={{ to: "/dashboard/workout-plans", label: "Back to Workout Plans" }}
+      />
+
+      <WorkoutPlanForm onSuccess={() => navigate("/dashboard/workout-plans")} />
     </div>
   );
 }
