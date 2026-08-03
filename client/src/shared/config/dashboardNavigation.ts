@@ -1,4 +1,4 @@
-import { ClipboardList, Dumbbell, Home, User } from "lucide-react";
+import { Bookmark, ClipboardList, Dumbbell, Home, User } from "lucide-react";
 import type {LucideIcon} from "lucide-react";
 
 export interface DashboardNavItem {
@@ -32,6 +32,13 @@ export const dashboardNavigation: DashboardNavItem[] = [
     icon: ClipboardList,
     title: "Workout Plans",
     description: "Create and manage your training routines.",
+  },
+  {
+    label: "Templates",
+    href: "/dashboard/templates",
+    icon: Bookmark,
+    title: "Templates",
+    description: "Reuse saved plans as templates.",
   },
   {
     label: "Profile",

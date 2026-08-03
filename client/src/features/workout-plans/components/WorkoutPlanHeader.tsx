@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
 
 interface WorkoutPlanHeaderProps {
   title: string;
@@ -12,12 +13,12 @@ export function WorkoutPlanHeader({ title, description, action, backLink }: Work
     <header className="flex items-start justify-between gap-4">
       <div className="space-y-1">
         {backLink && (
-          <a
-            href={backLink.to}
+          <Link
+            to={backLink.to}
             className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
           >
             ← {backLink.label}
-          </a>
+          </Link>
         )}
         <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
         {description && <p className="text-muted-foreground">{description}</p>}

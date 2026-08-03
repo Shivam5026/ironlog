@@ -16,6 +16,9 @@ import profileRouter from "./modules/profile/profile.route";
 import exerciseRoutes from "./modules/exercise/exercise.routes";
 import { workoutPlanRouter } from "./modules/workout-plan";
 import { workoutDayRouter } from "./modules/workout-day";
+import { workoutExerciseRouter } from "./modules/workout-exercise";
+import { templateRouter } from "./modules/template";
+import { dashboardRouter } from "./modules/dashboard";
 
 const app = express();
 
@@ -44,6 +47,9 @@ app.use("/api/profile", profileRouter);
 app.use("/api/exercises", exerciseRoutes);
 app.use("/api/workout-plans", workoutPlanRouter);
 app.use("/api/workout-days", workoutDayRouter);
+app.use("/api/workout-exercises", workoutExerciseRouter);
+app.use("/api/templates", templateRouter);
+app.use("/api/dashboard", dashboardRouter);
 
 app.use(notFound);
 

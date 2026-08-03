@@ -7,6 +7,7 @@ import {
   MusclesQuery,
 } from "./exercise.schemas";
 import { withCache } from "../../lib/cache";
+import type { Exercise } from "./exercise.types";
 
 const CACHE_KEYS = {
   BODY_PARTS: "exercise:bodyparts",
@@ -68,7 +69,7 @@ export async function getExercises(filters: ExerciseFilters) {
   return get("/exercises", params);
 }
 
-export async function getExerciseById(id: string) {
+export async function getExerciseById(id: string): Promise<Exercise> {
   return get(`/exercises/${id}`);
 }
 

@@ -88,6 +88,13 @@ export const router = createBrowserRouter([
             ],
           },
           {
+            path: "templates",
+            lazy: () =>
+              import("@/features/templates/pages/TemplatesPage").then((m) => ({
+                Component: m.default,
+              })),
+          },
+          {
             path: "exercises",
             children: [
               {

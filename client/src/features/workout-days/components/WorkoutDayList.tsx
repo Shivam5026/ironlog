@@ -2,10 +2,9 @@ import { useState, useCallback, useEffect } from "react";
 import {
   DndContext,
   closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
+  DragOverlay,
   type DragEndEvent,
+  type DragStartEvent,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -15,6 +14,9 @@ import { Dumbbell } from "lucide-react";
 
 import { EmptyState } from "@/shared/components/ui/EmptyState";
 import { SortableWorkoutDayCard } from "./SortableWorkoutDayCard";
+import { WorkoutDayOverlay } from "./WorkoutDayOverlay";
+import { useDndSensors } from "../dnd/sensors";
+import { reorderItems } from "../dnd/helpers";
 import { useReorderWorkoutDays } from "../hooks/useReorderWorkoutDays";
 import type { WorkoutDay } from "../types";
 
@@ -28,32 +30,33 @@ interface WorkoutDayListProps {
 export function WorkoutDayList({ days, workoutPlanId, onRename, onDelete }: WorkoutDayListProps) {
   const reorderDays = useReorderWorkoutDays();
   const [localDays, setLocalDays] = useState<WorkoutDay[] | null>(null);
+  const [activeDay, setActiveDay] = useState<WorkoutDay | null>(null);
 
   // Reset local state when plan changes
   useEffect(() => {
     setLocalDays(null);
   }, [workoutPlanId]);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-  );
+  const sensors = useDndSensors();
 
   const displayed = localDays ?? days;
+
+  const handleDragStart = useCallback(
+    (event: DragStartEvent) => {
+      const day = displayed.find((d) => d.id === event.active.id);
+      if (day) setActiveDay(day);
+    },
+    [displayed],
+  );
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
-      if (!over || active.id === over.id) {
-        return;
-      }
+      setActiveDay(null);
 
-      const oldIndex = displayed.findIndex((d) => d.id === active.id);
-      const newIndex = displayed.findIndex((d) => d.id === over.id);
-      if (oldIndex === -1 || newIndex === -1) return;
+      const reordered = over ? reorderItems(displayed, String(active.id), String(over.id)) : null;
+      if (!reordered) return;
 
-      const reordered = [...displayed];
-      const [moved] = reordered.splice(oldIndex, 1);
-      reordered.splice(newIndex, 0, moved);
       setLocalDays(reordered);
 
       const payload = {
@@ -82,7 +85,9 @@ export function WorkoutDayList({ days, workoutPlanId, onRename, onDelete }: Work
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      onDragCancel={() => setActiveDay(null)}
     >
       <SortableContext items={displayed.map((d) => d.id)} strategy={verticalListSortingStrategy}>
         <div className="mx-auto max-w-2xl space-y-4">
@@ -96,6 +101,10 @@ export function WorkoutDayList({ days, workoutPlanId, onRename, onDelete }: Work
           ))}
         </div>
       </SortableContext>
+
+      <DragOverlay>
+        {activeDay ? <WorkoutDayOverlay day={activeDay} /> : null}
+      </DragOverlay>
     </DndContext>
   );
 }

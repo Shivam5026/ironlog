@@ -5,7 +5,6 @@ import type {
   CreateWorkoutPlanInput,
   UpdateWorkoutPlanInput,
   CreateWorkoutDayInput,
-  AddExerciseInput,
 } from "./workout-plan.types";
 
 const PLAN_CACHE_PREFIX = "workout-plan:";
@@ -168,59 +167,6 @@ async function removeDay(dayId: string, userId: string) {
   await deleteCache(userPlansCacheKey(userId));
 }
 
-async function addExercise(workoutDayId: string, userId: string, data: AddExerciseInput) {
-  const day = await prisma.workoutDay.findUnique({
-    where: { id: workoutDayId },
-    include: { workoutPlan: true },
-  });
-
-  if (!day) {
-    throw new Error("Day not found");
-  }
-
-  if (day.workoutPlan.userId !== userId) {
-    throw new Error("Unauthorized");
-  }
-
-  const exercise = await prisma.workoutPlanExercise.create({
-    data: {
-      workoutDayId,
-      ...data,
-    },
-  });
-
-  await deleteCache(planCacheKey(day.workoutPlanId));
-  await deleteCache(userPlansCacheKey(userId));
-
-  return exercise;
-}
-
-async function removeExercise(exerciseId: string, userId: string) {
-  const exercise = await prisma.workoutPlanExercise.findUnique({
-    where: { id: exerciseId },
-    include: {
-      workoutDay: {
-        include: { workoutPlan: true },
-      },
-    },
-  });
-
-  if (!exercise) {
-    throw new Error("Exercise not found");
-  }
-
-  if (exercise.workoutDay.workoutPlan.userId !== userId) {
-    throw new Error("Unauthorized");
-  }
-
-  await prisma.workoutPlanExercise.delete({
-    where: { id: exerciseId },
-  });
-
-  await deleteCache(planCacheKey(exercise.workoutDay.workoutPlanId));
-  await deleteCache(userPlansCacheKey(userId));
-}
-
 async function duplicatePlan(planId: string, userId: string) {
   const plan = await prisma.workoutPlan.findUnique({
     where: { id: planId },
@@ -263,6 +209,8 @@ async function duplicatePlan(planId: string, userId: string) {
           data: day.exercises.map((ex) => ({
             workoutDayId: newDay.id,
             exerciseId: ex.exerciseId,
+            exerciseName: ex.exerciseName,
+            gifUrl: ex.gifUrl,
             order: ex.order,
             sets: ex.sets,
             reps: ex.reps,
@@ -301,6 +249,4 @@ export const workoutPlanService = {
   duplicatePlan,
   addDay,
   removeDay,
-  addExercise,
-  removeExercise,
 };

@@ -2,7 +2,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 import { WorkoutDayCard } from "./WorkoutDayCard";
-import { DragHandle } from "./DragHandle";
+import { WorkoutDayDragHandle } from "./WorkoutDayDragHandle";
 import type { WorkoutDay } from "../types";
 
 interface SortableWorkoutDayCardProps {
@@ -32,7 +32,7 @@ export function SortableWorkoutDayCard({ day, onRename, onDelete }: SortableWork
         day={day}
         onRename={onRename}
         onDelete={onDelete}
-        dragHandle={<DragHandle {...listeners} isDragging={isDragging} />}
+        dragHandle={<WorkoutDayDragHandle {...listeners} isDragging={isDragging} />}
         isDragging={isDragging}
       />
     </div>

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/Card";
@@ -6,6 +6,9 @@ import { Badge } from "@/shared/components/ui/Badge";
 import { Button } from "@/shared/components/ui/Button";
 
 import type { WorkoutDay } from "../types";
+import { ExerciseList } from "./ExerciseList";
+import { ExercisePickerDialog } from "@/features/workout-plans/components/ExercisePickerDialog";
+import { AddExerciseButton } from "@/features/workout-plans/components/AddExerciseButton";
 
 interface WorkoutDayCardProps {
   day: WorkoutDay;
@@ -17,6 +20,7 @@ interface WorkoutDayCardProps {
 
 export function WorkoutDayCard({ day, onRename, onDelete, dragHandle, isDragging }: WorkoutDayCardProps) {
   const exercises = day.exercises ?? [];
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   return (
     <Card className={isDragging ? "opacity-50 ring-2 ring-primary" : undefined}>
@@ -53,26 +57,25 @@ export function WorkoutDayCard({ day, onRename, onDelete, dragHandle, isDragging
       </CardHeader>
       <CardContent>
         {exercises.length > 0 ? (
-          <ol className="space-y-2">
-            {exercises
-              .sort((a, b) => a.order - b.order)
-              .map((ex) => (
-                <li
-                  key={ex.id}
-                  className="flex items-center justify-between rounded-lg bg-muted px-3 py-2 text-sm"
-                >
-                  <span className="font-medium">{ex.exercise?.name ?? ex.exerciseId}</span>
-                  <span className="whitespace-nowrap text-muted-foreground">
-                    {ex.sets}×{ex.reps}
-                    {ex.restTime ? ` · ${ex.restTime}s rest` : ""}
-                  </span>
-                </li>
-              ))}
-          </ol>
+          <ExerciseList
+            exercises={[...exercises].sort((a, b) => a.order - b.order)}
+            dayId={day.id}
+            dayName={day.name}
+          />
         ) : (
           <p className="py-2 text-sm text-muted-foreground">No exercises yet.</p>
         )}
+
+        <div className="mt-4">
+          <AddExerciseButton onClick={() => setPickerOpen(true)} />
+        </div>
       </CardContent>
+
+      <ExercisePickerDialog
+        workoutDayId={day.id}
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+      />
     </Card>
   );
 }

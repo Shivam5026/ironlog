@@ -9,6 +9,7 @@ import { Separator } from "@/shared/components/ui/Separator";
 
 import { useDeleteWorkoutPlan } from "../hooks/useDeleteWorkoutPlan";
 import { useDuplicateWorkoutPlan } from "../hooks/useDuplicateWorkoutPlan";
+import { TemplateButton } from "@/features/templates/components/TemplateButton";
 import type { WorkoutPlan } from "../types";
 
 interface WorkoutPlanCardProps {
@@ -75,8 +76,8 @@ export function WorkoutPlanCard({ plan }: WorkoutPlanCardProps) {
         <Card className="h-full transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg">
           <CardHeader>
             <div className="flex items-start justify-between gap-3">
-              <CardTitle className="text-lg capitalize">{plan.name}</CardTitle>
-              <Badge variant="secondary" className="shrink-0">
+              <CardTitle className="min-w-0 truncate text-lg capitalize">{plan.name}</CardTitle>
+              <Badge variant="secondary" className="shrink-0 group-hover:hidden">
                 {dayCount} {dayCount === 1 ? "day" : "days"}
               </Badge>
             </div>
@@ -103,7 +104,8 @@ export function WorkoutPlanCard({ plan }: WorkoutPlanCardProps) {
         </Card>
       </Link>
 
-      <div className="absolute right-3 top-3 z-10 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+      <div className="absolute right-3 top-3 z-10 flex gap-1 rounded-lg bg-card/90 p-1 opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
+        <TemplateButton workoutPlanId={plan.id} planName={plan.name} />
         <Button
           type="button"
           variant="ghost"

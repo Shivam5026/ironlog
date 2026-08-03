@@ -9,6 +9,7 @@ import { ErrorState } from "@/shared/components/ui/ErrorState";
 import { WorkoutPlanHeader } from "../components/WorkoutPlanHeader";
 import { WorkoutDayList } from "@/features/workout-days/components/WorkoutDayList";
 import { WorkoutDayForm } from "@/features/workout-days/components/WorkoutDayForm";
+import { RenameWorkoutDayDialog } from "@/features/workout-days/components/RenameWorkoutDayDialog";
 import { DeleteWorkoutDayDialog } from "@/features/workout-days/components/DeleteWorkoutDayDialog";
 import { useWorkoutPlanById } from "../hooks/useWorkoutPlanById";
 import { useDeleteWorkoutPlan } from "../hooks/useDeleteWorkoutPlan";
@@ -25,6 +26,7 @@ export default function WorkoutPlanDetailsPage() {
   const deleteDay = useDeleteWorkoutDay();
 
   const [deleteTarget, setDeleteTarget] = useState<WorkoutDay | null>(null);
+  const [renameTarget, setRenameTarget] = useState<WorkoutDay | null>(null);
   const [showForm, setShowForm] = useState(false);
 
   if (!planId) {
@@ -116,6 +118,7 @@ export default function WorkoutPlanDetailsPage() {
             <WorkoutDayForm
               workoutPlanId={planId}
               onSuccess={() => setShowForm(false)}
+              onCancel={() => setShowForm(false)}
             />
           </div>
         )}
@@ -130,10 +133,16 @@ export default function WorkoutPlanDetailsPage() {
         <WorkoutDayList
           days={days}
           workoutPlanId={planId}
-          onRename={() => {
-            // ponytail: wire to inline rename or a rename dialog
-          }}
+          onRename={(day) => setRenameTarget(day)}
           onDelete={(day) => setDeleteTarget(day)}
+        />
+      )}
+
+      {/* Rename dialog */}
+      {renameTarget && (
+        <RenameWorkoutDayDialog
+          day={renameTarget}
+          onClose={() => setRenameTarget(null)}
         />
       )}
 

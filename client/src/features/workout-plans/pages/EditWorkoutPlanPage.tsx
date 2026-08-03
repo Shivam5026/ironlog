@@ -8,11 +8,11 @@ import { useWorkoutPlans } from "../hooks/useWorkoutPlans";
 import WorkoutPlanForm from "../components/WorkoutPlanForm";
 
 export default function EditWorkoutPlanPage() {
-  const { id } = useParams<{ id: string }>();
+  const { planId } = useParams<{ planId: string }>();
   const navigate = useNavigate();
   const { data: plans, isPending, isError, error } = useWorkoutPlans();
 
-  const plan = plans?.find((p) => p.id === id);
+  const plan = plans?.find((p) => p.id === planId);
 
   if (isPending) {
     return (

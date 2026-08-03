@@ -12,12 +12,13 @@ export interface WorkoutDayExercise {
   id: string;
   workoutDayId: string;
   exerciseId: string;
+  exerciseName: string;
+  gifUrl?: string | null;
   order: number;
   sets: number;
   reps: number;
   restTime: number;
   notes?: string | null;
-  exercise?: { name: string } | null;
 }
 
 export interface CreateWorkoutDayPayload {

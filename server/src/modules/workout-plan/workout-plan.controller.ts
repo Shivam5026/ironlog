@@ -7,8 +7,6 @@ import {
   planIdSchema,
   createDaySchema,
   dayIdSchema,
-  addExerciseSchema,
-  exerciseIdSchema,
 } from "./workout-plan.schema";
 import { workoutPlanService } from "./workout-plan.service";
 
@@ -149,39 +147,3 @@ export async function removeDay(req: Request, res: Response, next: NextFunction)
   }
 }
 
-export async function addExercise(req: Request, res: Response, next: NextFunction) {
-  try {
-    const userId = req.session?.userId;
-    if (!userId) {
-      throw new ApiError(401, "Unauthorized");
-    }
-
-    const { dayId } = dayIdSchema.parse(req.params);
-    const data = addExerciseSchema.parse(req.body);
-    const exercise = await workoutPlanService.addExercise(dayId, userId, data);
-
-    return res.status(201).json(new ApiResponse(201, exercise, "Exercise added"));
-  } catch (error) {
-    next(error);
-  }
-}
-
-export async function removeExercise(
-  req: Request<{ exerciseId: string }>,
-  res: Response,
-  next: NextFunction,
-) {
-  try {
-    const userId = req.session?.userId;
-    if (!userId) {
-      throw new ApiError(401, "Unauthorized");
-    }
-
-    const { exerciseId } = exerciseIdSchema.parse(req.params);
-    await workoutPlanService.removeExercise(exerciseId, userId);
-
-    return res.status(200).json(new ApiResponse(200, null, "Exercise removed"));
-  } catch (error) {
-    next(error);
-  }
-}

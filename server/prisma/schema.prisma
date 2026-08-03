@@ -25,7 +25,8 @@ model User {
   accounts Account[]
   profile  Profile?
 
-  workoutPlans WorkoutPlan[]
+  workoutPlans     WorkoutPlan[]
+  workoutTemplates WorkoutTemplate[]
 
   @@unique([email])
   @@map("user")
@@ -152,6 +153,8 @@ model WorkoutPlanExercise {
 
   workoutDayId String
   exerciseId   String
+  exerciseName String
+  gifUrl       String?
 
   order Int
 
@@ -170,4 +173,65 @@ model WorkoutPlanExercise {
   @@index([workoutDayId])
   @@index([exerciseId])
   @@map("workout_plan_exercise")
+}
+
+model WorkoutTemplate {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  userId      String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  days TemplateDay[]
+
+  @@index([userId])
+  @@map("workout_template")
+}
+
+model TemplateDay {
+  id         String   @id @default(cuid())
+  templateId String
+  name       String
+  order      Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  template WorkoutTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  exercises TemplateExercise[]
+
+  @@unique([templateId, order])
+  @@index([templateId])
+  @@map("template_day")
+}
+
+model TemplateExercise {
+  id            String @id @default(cuid())
+  templateDayId String
+
+  exerciseId   String
+  exerciseName String
+  gifUrl       String?
+
+  order Int
+
+  sets     Int @default(3)
+  reps     Int @default(10)
+  restTime Int @default(90)
+
+  notes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  templateDay TemplateDay @relation(fields: [templateDayId], references: [id], onDelete: Cascade)
+
+  @@unique([templateDayId, order])
+  @@index([templateDayId])
+  @@index([exerciseId])
+  @@map("template_exercise")
 }

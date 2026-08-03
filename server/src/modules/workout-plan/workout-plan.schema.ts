@@ -23,20 +23,6 @@ export const dayIdSchema = z.object({
   dayId: z.string(),
 });
 
-export const addExerciseSchema = z.object({
-  exerciseId: z.string(),
-  order: z.coerce.number().int().min(0),
-  sets: z.coerce.number().int().min(1).max(50).default(3),
-  reps: z.coerce.number().int().min(1).max(100).default(10),
-  restTime: z.coerce.number().int().min(0).max(600).default(90),
-  notes: z.string().trim().max(500).optional(),
-});
-
-export const exerciseIdSchema = z.object({
-  exerciseId: z.string(),
-});
-
 export type CreatePlanInput = z.infer<typeof createPlanSchema>;
 export type UpdatePlanInput = z.infer<typeof updatePlanSchema>;
 export type CreateDayInput = z.infer<typeof createDaySchema>;
-export type AddExerciseInput = z.infer<typeof addExerciseSchema>;

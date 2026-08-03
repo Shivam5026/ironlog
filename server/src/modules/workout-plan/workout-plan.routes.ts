@@ -17,7 +17,4 @@ router.post("/:id/duplicate", workoutPlanController.duplicatePlan);
 router.post("/:id/days", workoutPlanController.addDay);
 router.delete("/:id/days/:dayId", workoutPlanController.removeDay);
 
-router.post("/days/:dayId/exercises", workoutPlanController.addExercise);
-router.delete("/exercises/:exerciseId", workoutPlanController.removeExercise);
-
 export default router;

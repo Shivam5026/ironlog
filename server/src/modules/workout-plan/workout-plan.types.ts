@@ -1,4 +1,4 @@
-import type { Prisma } from "../../generated/prisma";
+import type { Prisma } from "../../generated/prisma/client";
 
 export type WorkoutPlan = Prisma.WorkoutPlanGetPayload<{
   include: {
@@ -31,13 +31,4 @@ export type UpdateWorkoutPlanInput = {
 export type CreateWorkoutDayInput = {
   name: string;
   order: number;
-};
-
-export type AddExerciseInput = {
-  exerciseId: string;
-  order: number;
-  sets?: number;
-  reps?: number;
-  restTime?: number;
-  notes?: string;
 };

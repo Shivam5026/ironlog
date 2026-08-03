@@ -1,7 +1,7 @@
 export type CreateWorkoutDayInput = {
   workoutPlanId: string;
   name: string;
-  order: number;
+  order?: number;
 };
 
 export type UpdateWorkoutDayInput = {
