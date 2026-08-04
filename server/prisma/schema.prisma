@@ -27,6 +27,7 @@ model User {
 
   workoutPlans     WorkoutPlan[]
   workoutTemplates WorkoutTemplate[]
+  workoutSessions  WorkoutSession[]
 
   @@unique([email])
   @@map("user")
@@ -125,6 +126,8 @@ model WorkoutPlan {
 
   workoutDays WorkoutDay[]
 
+  workoutSessions WorkoutSession[]
+
   @@index([userId])
   @@map("workout_plan")
 }
@@ -173,6 +176,89 @@ model WorkoutPlanExercise {
   @@index([workoutDayId])
   @@index([exerciseId])
   @@map("workout_plan_exercise")
+}
+
+enum WorkoutSessionStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ABANDONED
+}
+
+enum SetType {
+  WARMUP
+  WORKING
+  FAILURE
+}
+
+model WorkoutSession {
+  id            String @id @default(cuid())
+  userId        String
+  workoutPlanId String
+
+  status      WorkoutSessionStatus @default(ACTIVE)
+  startedAt   DateTime              @default(now())
+  endedAt     DateTime?
+  duration    Int?
+  totalVolume Decimal? @db.Decimal(10, 2)
+
+  workoutPlan WorkoutPlan @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  exerciseLogs ExerciseLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([workoutPlanId])
+  @@map("workout_session")
+}
+
+model ExerciseLog {
+  id               String @id @default(cuid())
+  workoutSessionId String
+  exerciseId       String
+  exerciseName     String
+  exerciseOrder    Int
+  notes            String?
+
+  workoutSession WorkoutSession @relation(fields: [workoutSessionId], references: [id], onDelete: Cascade)
+
+  sets ExerciseLogSet[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([workoutSessionId])
+  @@map("exercise_log")
+}
+
+model ExerciseLogSet {
+  id            String @id @default(cuid())
+  exerciseLogId String
+  setNumber     Int
+  weight        Decimal @db.Decimal(8, 2)
+  reps          Int
+  restTime      Int     @default(90)
+  completed     Boolean @default(false)
+
+  setType   SetType @default(WORKING)
+  isWarmup  Boolean @default(false)
+  isFailure Boolean @default(false)
+
+  rpe   Decimal? @db.Decimal(4, 1)
+  rir   Int?
+  tempo String?
+
+  exerciseLog ExerciseLog @relation(fields: [exerciseLogId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([exerciseLogId])
+  @@unique([exerciseLogId, setNumber])
+  @@map("exercise_log_set")
 }
 
 model WorkoutTemplate {
