@@ -20,6 +20,7 @@ import CreateWorkoutPlanPage from "@/features/workout-plans/pages/CreateWorkoutP
 import EditWorkoutPlanPage from "@/features/workout-plans/pages/EditWorkoutPlanPage";
 import WorkoutPlansPage from "@/features/workout-plans/pages/WorkoutPlansPage";
 import WorkoutPlanDetailsPage from "@/features/workout-plans/pages/WorkoutPlanDetailsPage";
+import LiveWorkoutPage from "@/features/workout-session/pages/LiveWorkoutPage";
 
 export const router = createBrowserRouter([
   {
@@ -93,6 +94,10 @@ export const router = createBrowserRouter([
               import("@/features/templates/pages/TemplatesPage").then((m) => ({
                 Component: m.default,
               })),
+          },
+          {
+            path: "workout/:sessionId",
+            element: <LiveWorkoutPage />,
           },
           {
             path: "exercises",

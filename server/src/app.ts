@@ -19,6 +19,12 @@ import { workoutDayRouter } from "./modules/workout-day";
 import { workoutExerciseRouter } from "./modules/workout-exercise";
 import { templateRouter } from "./modules/template";
 import { dashboardRouter } from "./modules/dashboard";
+import {
+  workoutSessionRouter,
+  exerciseLogRouter,
+  exerciseLogSetRouter,
+  performanceRouter,
+} from "./modules/workout-session";
 
 const app = express();
 
@@ -50,6 +56,10 @@ app.use("/api/workout-days", workoutDayRouter);
 app.use("/api/workout-exercises", workoutExerciseRouter);
 app.use("/api/templates", templateRouter);
 app.use("/api/dashboard", dashboardRouter);
+app.use("/api/workout-sessions", workoutSessionRouter);
+app.use("/api/exercise-logs", exerciseLogRouter);
+app.use("/api/exercise-log-sets", exerciseLogSetRouter);
+app.use("/api/performance", performanceRouter);
 
 app.use(notFound);
 

@@ -7,6 +7,7 @@ import { Separator } from "@/shared/components/ui/Separator";
 import { ErrorState } from "@/shared/components/ui/ErrorState";
 
 import { WorkoutPlanHeader } from "../components/WorkoutPlanHeader";
+import { StartWorkoutButton } from "@/features/workout-session/components/StartWorkoutButton";
 import { WorkoutDayList } from "@/features/workout-days/components/WorkoutDayList";
 import { WorkoutDayForm } from "@/features/workout-days/components/WorkoutDayForm";
 import { RenameWorkoutDayDialog } from "@/features/workout-days/components/RenameWorkoutDayDialog";
@@ -73,6 +74,7 @@ export default function WorkoutPlanDetailsPage() {
         backLink={{ to: "/dashboard/workout-plans", label: "Back to Workout Plans" }}
         action={
           <div className="flex gap-2">
+            <StartWorkoutButton workoutPlanId={plan.id} />
             <Button
               variant="outline"
               onClick={() => navigate(`/dashboard/workout-plans/${plan.id}/edit`)}
