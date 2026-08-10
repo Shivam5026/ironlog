@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Timer, X } from "lucide-react";
 
 import { Badge } from "@/shared/components/ui/Badge";
@@ -7,17 +6,8 @@ import { useRestTimer } from "../hooks/useRestTimer";
 import { formatDuration } from "../utils/format";
 
 export function RestTimer() {
-  const { remainingTime, startRest, stopRest } = useRestTimer();
+  const { remainingTime, stopRest } = useRestTimer();
   const active = remainingTime > 0;
-
-  useEffect(() => {
-    if (!active) return;
-    const timeout = setTimeout(() => {
-      // nudge: briefly highlight the badge when rest completes
-      // (placeholder for an audio/visual cue)
-    }, 0);
-    return () => clearTimeout(timeout);
-  }, [active, remainingTime]);
 
   if (!active) {
     return null;

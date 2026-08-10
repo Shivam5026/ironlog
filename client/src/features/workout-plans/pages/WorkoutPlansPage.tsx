@@ -87,7 +87,12 @@ export default function WorkoutPlansPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <Select value={sort} onValueChange={(v: SortKey) => setSort(v)}>
+        <Select
+          value={sort}
+          onValueChange={(v) => {
+            if (v === "newest" || v === "oldest" || v === "name") setSort(v);
+          }}
+        >
           <SelectTrigger className="w-[140px]" aria-label="Sort plans">
             <ArrowUpDown className="size-3.5" />
             <SelectValue />

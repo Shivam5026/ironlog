@@ -19,6 +19,8 @@ export interface WorkoutDayExercise {
   reps: number;
   restTime: number;
   notes?: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateWorkoutDayPayload {

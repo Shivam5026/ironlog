@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui
 import { PersonalRecordBadge } from "./PersonalRecordBadge";
 import { ProgressIndicator } from "./ProgressIndicator";
 import { usePreviousPerformance } from "../hooks/usePerformance";
-import type { PreviousPerformance } from "../types/performance";
 
 interface PreviousPerformanceCardProps {
   exerciseId: string;

@@ -4,14 +4,16 @@ import { useStartWorkout } from "../hooks/useStartWorkout";
 
 interface StartWorkoutButtonProps {
   workoutPlanId: string;
+  workoutDayId: string;
+  label?: string;
 }
 
-export function StartWorkoutButton({ workoutPlanId }: StartWorkoutButtonProps) {
+export function StartWorkoutButton({ workoutPlanId, workoutDayId, label = "Start Workout" }: StartWorkoutButtonProps) {
   const startWorkout = useStartWorkout();
 
   return (
     <Button
-      onClick={() => startWorkout.mutate(workoutPlanId)}
+      onClick={() => startWorkout.mutate({ workoutPlanId, workoutDayId })}
       disabled={startWorkout.isPending}
     >
       {startWorkout.isPending ? (
@@ -19,7 +21,7 @@ export function StartWorkoutButton({ workoutPlanId }: StartWorkoutButtonProps) {
       ) : (
         <Play className="h-4 w-4" />
       )}
-      {startWorkout.isPending ? "Starting..." : "Start Workout"}
+      {startWorkout.isPending ? "Starting..." : label}
     </Button>
   );
 }

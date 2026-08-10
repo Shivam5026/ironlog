@@ -7,7 +7,8 @@ export function useStartWorkout() {
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: (workoutPlanId: string) => workoutSessionApi.start(workoutPlanId),
+    mutationFn: ({ workoutPlanId, workoutDayId }: { workoutPlanId: string; workoutDayId: string }) =>
+      workoutSessionApi.start(workoutPlanId, workoutDayId),
 
     onSuccess: (session) => {
       toast.success("Workout started.");

@@ -4,7 +4,7 @@ import type {
   ExerciseHistoryEntry,
   PersonalRecord,
   PreviousPerformance,
-} from "../types";
+} from "../types/performance";
 
 export const performanceApi = {
   async getPreviousPerformance(exerciseId: string) {

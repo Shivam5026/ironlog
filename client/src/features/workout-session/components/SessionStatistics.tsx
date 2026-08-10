@@ -17,7 +17,8 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 
 export function SessionStatistics({ session }: SessionStatisticsProps) {
-  const { totalSets, completedSets, totalReps, totalVolume } = useWorkoutProgress(session);
+  const { totalSets, completedSets, totalReps, totalVolume, completedExercises, totalExercises } =
+    useWorkoutProgress(session);
   const { elapsedSeconds } = useWorkoutTimer();
 
   const durationSeconds =
@@ -26,11 +27,12 @@ export function SessionStatistics({ session }: SessionStatisticsProps) {
       : elapsedSeconds;
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
       <Stat label="Total sets" value={String(totalSets)} />
       <Stat label="Completed sets" value={String(completedSets)} />
       <Stat label="Total reps" value={String(totalReps)} />
       <Stat label="Total volume" value={`${Math.round(totalVolume)} kg`} />
+      <Stat label="Exercises" value={`${completedExercises}/${totalExercises}`} />
       <Stat label="Duration" value={formatDuration(durationSeconds)} />
     </div>
   );

@@ -56,7 +56,7 @@ async function createExerciseLog(userId: string, data: CreateExerciseLogInput) {
 async function getExerciseLog(logId: string, userId: string) {
   const log = await prisma.exerciseLog.findUnique({
     where: { id: logId },
-    include: { ...LOG_INCLUDE, workoutSession: { select: { userId: true } } },
+    include: { ...LOG_INCLUDE, workoutSession: { select: { userId: true, status: true } } },
   });
 
   if (!log) {
@@ -71,7 +71,11 @@ async function getExerciseLog(logId: string, userId: string) {
 }
 
 async function updateExerciseLog(logId: string, userId: string, data: UpdateExerciseLogInput) {
-  await getExerciseLog(logId, userId);
+  const log = await getExerciseLog(logId, userId);
+
+  if (log.workoutSession.status !== "ACTIVE") {
+    throw new ApiError(409, "Cannot update a log on a session that is not active");
+  }
 
   return prisma.$transaction(async (tx) => {
     const sets = data.sets;
@@ -137,7 +141,11 @@ async function updateExerciseLog(logId: string, userId: string, data: UpdateExer
 }
 
 async function deleteExerciseLog(logId: string, userId: string) {
-  await getExerciseLog(logId, userId);
+  const log = await getExerciseLog(logId, userId);
+
+  if (log.workoutSession.status !== "ACTIVE") {
+    throw new ApiError(409, "Cannot delete a log on a session that is not active");
+  }
 
   return prisma.exerciseLog.delete({
     where: { id: logId },

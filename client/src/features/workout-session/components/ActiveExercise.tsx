@@ -3,6 +3,7 @@ import { SkipForward, Loader2 } from "lucide-react";
 import { Button } from "@/shared/components/ui/Button";
 import { ExerciseLogger } from "./ExerciseLogger";
 import { PreviousPerformanceCard } from "./PreviousPerformanceCard";
+import { ExerciseHistoryCard } from "./ExerciseHistoryCard";
 import type { ExerciseLog } from "../types";
 
 interface ActiveExerciseProps {
@@ -29,7 +30,7 @@ export function ActiveExercise({
       <ExerciseLogger
         sessionId={sessionId}
         log={log}
-        onSetCompleted={onStartRest}
+        onSetCompleted={(set) => onStartRest(set.restTime)}
         onAllSetsCompleted={onComplete}
       />
 
@@ -38,6 +39,8 @@ export function ActiveExercise({
         currentWeight={Number(log.sets[log.sets.length - 1]?.weight ?? 0)}
         currentReps={log.sets[log.sets.length - 1]?.reps ?? 0}
       />
+
+      <ExerciseHistoryCard exerciseId={log.exerciseId} />
 
       <div className="flex items-center justify-between">
         <p className="text-xs text-muted-foreground">

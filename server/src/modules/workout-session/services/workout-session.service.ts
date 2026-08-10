@@ -3,7 +3,7 @@ import { ApiError } from "../../../utils/ApiError";
 import { timerService } from "./timer.service";
 import type { StartWorkoutInput } from "../types/workout-session.types";
 
-const SESSION_INCLUDE = {
+export const SESSION_INCLUDE = {
   workoutPlan: {
     include: {
       workoutDays: {
@@ -33,7 +33,7 @@ async function getSession(sessionId: string, userId: string) {
   return session;
 }
 
-async function startWorkout(userId: string, { workoutPlanId }: StartWorkoutInput) {
+async function startWorkout(userId: string, { workoutPlanId, workoutDayId }: StartWorkoutInput) {
   const plan = await prisma.workoutPlan.findFirst({
     where: { id: workoutPlanId, userId },
     include: {
@@ -50,37 +50,54 @@ async function startWorkout(userId: string, { workoutPlanId }: StartWorkoutInput
     throw new ApiError(404, "Workout plan not found");
   }
 
+  // A session runs one day of the plan. Verify the day belongs to this plan
+  // (and therefore this user) — rejects a day from another plan/user.
+  const day = plan.workoutDays.find((d) => d.id === workoutDayId);
+  if (!day) {
+    throw new ApiError(400, "Workout day does not belong to this plan");
+  }
+
+  // Only one live session per user: a leftover ACTIVE/PAUSED session is
+  // resumed instead of a new one being created (double-click / crash / tab
+  // close all land here). Abandoned or completed sessions don't count.
+  const live = await prisma.workoutSession.findFirst({
+    where: { userId, status: { in: ["ACTIVE", "PAUSED"] } },
+    select: { id: true },
+  });
+  if (live) {
+    return getSession(live.id, userId);
+  }
+
   const session = await prisma.$transaction(async (tx) => {
     const created = await tx.workoutSession.create({
       data: {
         userId,
         workoutPlanId,
+        workoutDayId: day.id,
         status: "ACTIVE",
       },
     });
 
     let exerciseOrder = 0;
 
-    for (const day of plan.workoutDays) {
-      for (const exercise of day.exercises) {
-        await tx.exerciseLog.create({
-          data: {
-            workoutSessionId: created.id,
-            exerciseId: exercise.exerciseId,
-            exerciseName: exercise.exerciseName,
-            exerciseOrder: exerciseOrder++,
-            sets: {
-              create: Array.from({ length: exercise.sets }, (_, i) => ({
-                setNumber: i + 1,
-                weight: 0,
-                reps: exercise.reps,
-                restTime: exercise.restTime,
-                setType: "WORKING",
-              })),
-            },
+    for (const exercise of day.exercises) {
+      await tx.exerciseLog.create({
+        data: {
+          workoutSessionId: created.id,
+          exerciseId: exercise.exerciseId,
+          exerciseName: exercise.exerciseName,
+          exerciseOrder: exerciseOrder++,
+          sets: {
+            create: Array.from({ length: exercise.sets }, (_, i) => ({
+              setNumber: i + 1,
+              weight: 0,
+              reps: exercise.reps,
+              restTime: exercise.restTime,
+              setType: "WORKING",
+            })),
           },
-        });
-      }
+        },
+      });
     }
 
     return created;
@@ -99,6 +116,7 @@ async function pauseWorkout(sessionId: string, userId: string) {
   return prisma.workoutSession.update({
     where: { id: sessionId },
     data: { status: "PAUSED" },
+    include: SESSION_INCLUDE,
   });
 }
 
@@ -112,6 +130,7 @@ async function resumeWorkout(sessionId: string, userId: string) {
   return prisma.workoutSession.update({
     where: { id: sessionId },
     data: { status: "ACTIVE" },
+    include: SESSION_INCLUDE,
   });
 }
 
@@ -143,6 +162,7 @@ async function finishWorkout(sessionId: string, userId: string) {
         duration: timerService.computeElapsedSeconds(session.startedAt, now),
         totalVolume,
       },
+      include: SESSION_INCLUDE,
     });
   });
 }

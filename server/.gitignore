@@ -143,5 +143,8 @@ dist
 
 /src/generated/prisma
 
+tests
+test-results
+
 # End of https://www.toptal.com/developers/gitignore/api/node
 /src/generated/prisma

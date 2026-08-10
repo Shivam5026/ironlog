@@ -95,6 +95,7 @@ export function WorkoutDayList({ days, workoutPlanId, onRename, onDelete }: Work
             <SortableWorkoutDayCard
               key={day.id}
               day={day}
+              workoutPlanId={workoutPlanId}
               onRename={onRename}
               onDelete={onDelete}
             />

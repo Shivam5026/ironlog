@@ -17,6 +17,8 @@ interface TimerStore {
 
   startRest: (seconds: number) => void;
   stopRest: () => void;
+
+  hydrate: (workoutElapsed: number, restRemaining: number, workoutRunning: boolean) => void;
 }
 
 function clearHandle(handle: TimerHandle | null) {
@@ -33,8 +35,9 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
 
   startWorkoutTimer: () => {
     if (get().workoutInterval) return;
+    const startedAt = Date.now() - get().workoutElapsed * 1000;
     const interval = setInterval(() => {
-      set((state) => ({ workoutElapsed: state.workoutElapsed + 1 }));
+      set({ workoutElapsed: Math.floor((Date.now() - startedAt) / 1000) });
     }, 1000);
     set({ workoutInterval: interval, workoutRunning: true });
   },
@@ -46,8 +49,9 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
 
   resumeWorkoutTimer: () => {
     if (get().workoutInterval) return;
+    const startedAt = Date.now() - get().workoutElapsed * 1000;
     const interval = setInterval(() => {
-      set((state) => ({ workoutElapsed: state.workoutElapsed + 1 }));
+      set({ workoutElapsed: Math.floor((Date.now() - startedAt) / 1000) });
     }, 1000);
     set({ workoutInterval: interval, workoutRunning: true });
   },
@@ -59,21 +63,34 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
 
   startRest: (seconds) => {
     clearHandle(get().restInterval);
+    const endsAt = Date.now() + seconds * 1000;
     set({ restRemaining: seconds });
     const interval = setInterval(() => {
-      set((state) => {
-        if (state.restRemaining <= 1) {
-          clearHandle(interval);
-          return { restRemaining: 0, restInterval: null };
-        }
-        return { restRemaining: state.restRemaining - 1 };
-      });
-    }, 1000);
+      const remaining = Math.max(0, Math.ceil((endsAt - Date.now()) / 1000));
+      if (remaining <= 0) {
+        clearHandle(interval);
+        set({ restRemaining: 0, restInterval: null });
+        return;
+      }
+      set({ restRemaining: remaining });
+    }, 250);
     set({ restInterval: interval });
   },
 
   stopRest: () => {
     clearHandle(get().restInterval);
     set({ restRemaining: 0, restInterval: null });
+  },
+
+  hydrate: (workoutElapsed, restRemaining, workoutRunning) => {
+    clearHandle(get().workoutInterval);
+    clearHandle(get().restInterval);
+    set({
+      workoutElapsed,
+      restRemaining,
+      workoutRunning,
+      workoutInterval: null,
+      restInterval: null,
+    });
   },
 }));

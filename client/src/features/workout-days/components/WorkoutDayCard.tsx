@@ -9,16 +9,18 @@ import type { WorkoutDay } from "../types";
 import { ExerciseList } from "./ExerciseList";
 import { ExercisePickerDialog } from "@/features/workout-plans/components/ExercisePickerDialog";
 import { AddExerciseButton } from "@/features/workout-plans/components/AddExerciseButton";
+import { StartWorkoutButton } from "@/features/workout-session/components/StartWorkoutButton";
 
 interface WorkoutDayCardProps {
   day: WorkoutDay;
+  workoutPlanId: string;
   onRename: (day: WorkoutDay) => void;
   onDelete: (day: WorkoutDay) => void;
   dragHandle?: ReactNode;
   isDragging?: boolean;
 }
 
-export function WorkoutDayCard({ day, onRename, onDelete, dragHandle, isDragging }: WorkoutDayCardProps) {
+export function WorkoutDayCard({ day, workoutPlanId, onRename, onDelete, dragHandle, isDragging }: WorkoutDayCardProps) {
   const exercises = day.exercises ?? [];
   const [pickerOpen, setPickerOpen] = useState(false);
 
@@ -66,8 +68,13 @@ export function WorkoutDayCard({ day, onRename, onDelete, dragHandle, isDragging
           <p className="py-2 text-sm text-muted-foreground">No exercises yet.</p>
         )}
 
-        <div className="mt-4">
+        <div className="mt-4 flex items-center gap-2">
           <AddExerciseButton onClick={() => setPickerOpen(true)} />
+          <StartWorkoutButton
+            workoutPlanId={workoutPlanId}
+            workoutDayId={day.id}
+            label={`Start ${day.name}`}
+          />
         </div>
       </CardContent>
 

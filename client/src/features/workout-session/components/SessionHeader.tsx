@@ -1,6 +1,8 @@
 import { Badge } from "@/shared/components/ui/Badge";
 import { WorkoutTimer } from "./WorkoutTimer";
 import { ExerciseNavigator } from "./ExerciseNavigator";
+import { AutoSaveIndicator } from "./AutoSaveIndicator";
+import { useRecoveryStore } from "../store/recovery-store";
 import type { WorkoutSession } from "../types";
 
 const statusLabel: Record<string, string> = {
@@ -17,6 +19,10 @@ interface SessionHeaderProps {
 }
 
 export function SessionHeader({ session, currentIndex, onOpenList }: SessionHeaderProps) {
+  const lastSavedAt = useRecoveryStore((state) => state.lastSavedAt);
+  const isSaving = useRecoveryStore((state) => state.isSaving);
+  const hasUnsavedChanges = useRecoveryStore((state) => state.hasUnsavedChanges);
+
   return (
     <header className="flex items-center justify-between gap-4">
       <div className="space-y-1">
@@ -35,6 +41,11 @@ export function SessionHeader({ session, currentIndex, onOpenList }: SessionHead
         <Badge variant={session.status === "ACTIVE" ? "default" : "secondary"}>
           {statusLabel[session.status] ?? session.status}
         </Badge>
+        <AutoSaveIndicator
+          lastSavedAt={lastSavedAt}
+          isSaving={isSaving}
+          hasUnsavedChanges={hasUnsavedChanges}
+        />
       </div>
     </header>
   );

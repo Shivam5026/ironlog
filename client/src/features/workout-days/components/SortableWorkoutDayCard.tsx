@@ -7,11 +7,12 @@ import type { WorkoutDay } from "../types";
 
 interface SortableWorkoutDayCardProps {
   day: WorkoutDay;
+  workoutPlanId: string;
   onRename: (day: WorkoutDay) => void;
   onDelete: (day: WorkoutDay) => void;
 }
 
-export function SortableWorkoutDayCard({ day, onRename, onDelete }: SortableWorkoutDayCardProps) {
+export function SortableWorkoutDayCard({ day, workoutPlanId, onRename, onDelete }: SortableWorkoutDayCardProps) {
   const {
     attributes,
     listeners,
@@ -30,6 +31,7 @@ export function SortableWorkoutDayCard({ day, onRename, onDelete }: SortableWork
     <div ref={setNodeRef} style={style} {...attributes}>
       <WorkoutDayCard
         day={day}
+        workoutPlanId={workoutPlanId}
         onRename={onRename}
         onDelete={onDelete}
         dragHandle={<WorkoutDayDragHandle {...listeners} isDragging={isDragging} />}

@@ -24,6 +24,9 @@ import {
   exerciseLogRouter,
   exerciseLogSetRouter,
   performanceRouter,
+  recoveryRouter,
+  workoutSummaryRouter,
+  historyRouter,
 } from "./modules/workout-session";
 
 const app = express();
@@ -57,9 +60,12 @@ app.use("/api/workout-exercises", workoutExerciseRouter);
 app.use("/api/templates", templateRouter);
 app.use("/api/dashboard", dashboardRouter);
 app.use("/api/workout-sessions", workoutSessionRouter);
+app.use("/api/workout-sessions", workoutSummaryRouter);
 app.use("/api/exercise-logs", exerciseLogRouter);
 app.use("/api/exercise-log-sets", exerciseLogSetRouter);
 app.use("/api/performance", performanceRouter);
+app.use("/api/recovery", recoveryRouter);
+app.use("/api/history", historyRouter);
 
 app.use(notFound);
 

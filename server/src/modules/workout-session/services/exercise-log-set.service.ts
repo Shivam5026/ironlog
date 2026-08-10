@@ -13,7 +13,7 @@ async function assertLogOwned(logId: string, userId: string) {
       id: logId,
       workoutSession: { userId },
     },
-    select: { id: true },
+    select: { id: true, workoutSession: { select: { status: true } } },
   });
 
   if (!log) {
@@ -23,8 +23,18 @@ async function assertLogOwned(logId: string, userId: string) {
   return log;
 }
 
+async function assertLogActive(logId: string, userId: string) {
+  const log = await assertLogOwned(logId, userId);
+
+  if (log.workoutSession.status !== "ACTIVE") {
+    throw new ApiError(409, "Cannot modify sets on a session that is not active");
+  }
+
+  return log;
+}
+
 async function createSet(userId: string, data: CreateExerciseLogSetInput) {
-  await assertLogOwned(data.exerciseLogId, userId);
+  await assertLogActive(data.exerciseLogId, userId);
 
   return prisma.exerciseLogSet.create({
     data: {
@@ -46,6 +56,7 @@ async function getOwnedSet(setId: string, userId: string) {
       id: setId,
       exerciseLog: { workoutSession: { userId } },
     },
+    include: { exerciseLog: { select: { workoutSession: { select: { status: true } } } } },
   });
 
   if (!set) {
@@ -56,7 +67,11 @@ async function getOwnedSet(setId: string, userId: string) {
 }
 
 async function updateSet(setId: string, userId: string, data: UpdateExerciseLogSetInput) {
-  await getOwnedSet(setId, userId);
+  const set = await getOwnedSet(setId, userId);
+
+  if (set.exerciseLog.workoutSession.status !== "ACTIVE") {
+    throw new ApiError(409, "Cannot modify sets on a session that is not active");
+  }
 
   return prisma.exerciseLogSet.update({
     where: { id: setId },
@@ -69,7 +84,11 @@ async function updateSet(setId: string, userId: string, data: UpdateExerciseLogS
 }
 
 async function completeSet(setId: string, userId: string, data: CompleteExerciseLogSetInput) {
-  await getOwnedSet(setId, userId);
+  const set = await getOwnedSet(setId, userId);
+
+  if (set.exerciseLog.workoutSession.status !== "ACTIVE") {
+    throw new ApiError(409, "Cannot modify sets on a session that is not active");
+  }
 
   return prisma.exerciseLogSet.update({
     where: { id: setId },
@@ -78,7 +97,11 @@ async function completeSet(setId: string, userId: string, data: CompleteExercise
 }
 
 async function deleteSet(setId: string, userId: string) {
-  await getOwnedSet(setId, userId);
+  const set = await getOwnedSet(setId, userId);
+
+  if (set.exerciseLog.workoutSession.status !== "ACTIVE") {
+    throw new ApiError(409, "Cannot modify sets on a session that is not active");
+  }
 
   return prisma.exerciseLogSet.delete({
     where: { id: setId },
@@ -87,7 +110,11 @@ async function deleteSet(setId: string, userId: string) {
 
 async function reorderSets(userId: string, data: ReorderExerciseLogSetInput) {
   const { exerciseLogId, orderedIds } = data;
-  await assertLogOwned(exerciseLogId, userId);
+  const log = await assertLogOwned(exerciseLogId, userId);
+
+  if (log.workoutSession.status !== "ACTIVE") {
+    throw new ApiError(409, "Cannot modify sets on a session that is not active");
+  }
 
   const existing = await prisma.exerciseLogSet.findMany({
     where: { exerciseLogId },
@@ -100,12 +127,14 @@ async function reorderSets(userId: string, data: ReorderExerciseLogSetInput) {
   }
 
   return prisma.$transaction(async (tx) => {
-    // temporarily push all sets out of the unique constraint range,
-    // then write the real order
-    await tx.exerciseLogSet.updateMany({
-      where: { exerciseLogId },
-      data: { setNumber: -1 },
-    });
+    // temporarily push each set to a distinct negative number (out of the
+    // unique(exerciseLogId, setNumber) range), then write the real order
+    for (const [index, set] of existing.entries()) {
+      await tx.exerciseLogSet.update({
+        where: { id: set.id },
+        data: { setNumber: -(index + 1) },
+      });
+    }
 
     for (const [index, id] of orderedIds.entries()) {
       await tx.exerciseLogSet.update({

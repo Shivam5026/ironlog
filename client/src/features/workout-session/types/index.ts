@@ -2,6 +2,7 @@ export type WorkoutSessionStatus = "ACTIVE" | "PAUSED" | "COMPLETED" | "ABANDONE
 
 export type WorkoutSessionSet = {
   id: string;
+  exerciseLogId: string;
   setNumber: number;
   weight: string;
   reps: number;
@@ -70,6 +71,7 @@ export type WorkoutSession = {
   id: string;
   userId: string;
   workoutPlanId: string;
+  workoutDayId: string;
   status: WorkoutSessionStatus;
   startedAt: string;
   endedAt: string | null;

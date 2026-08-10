@@ -100,6 +100,27 @@ export const router = createBrowserRouter([
             element: <LiveWorkoutPage />,
           },
           {
+            path: "workout/:sessionId/summary",
+            lazy: () =>
+              import("@/features/workout-session/pages/WorkoutSummaryPage").then((m) => ({
+                Component: m.default,
+              })),
+          },
+          {
+            path: "workout-history",
+            lazy: () =>
+              import("@/features/workout-session/pages/WorkoutHistoryPage").then((m) => ({
+                Component: m.default,
+              })),
+          },
+          {
+            path: "workout-history/:sessionId",
+            lazy: () =>
+              import("@/features/workout-session/pages/WorkoutDetailsPage").then((m) => ({
+                Component: m.default,
+              })),
+          },
+          {
             path: "exercises",
             children: [
               {

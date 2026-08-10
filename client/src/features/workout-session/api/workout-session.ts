@@ -3,10 +3,10 @@ import type { ApiResponse } from "@/shared/types/ApiResponse";
 import type { WorkoutSession } from "../types";
 
 export const workoutSessionApi = {
-  async start(workoutPlanId: string) {
+  async start(workoutPlanId: string, workoutDayId: string) {
     const { data } = await api.post<ApiResponse<WorkoutSession>>(
       "/workout-sessions/start",
-      { workoutPlanId },
+      { workoutPlanId, workoutDayId },
     );
     return data.data;
   },

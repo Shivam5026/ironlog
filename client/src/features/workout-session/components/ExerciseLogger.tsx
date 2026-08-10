@@ -34,7 +34,9 @@ export function ExerciseLogger({
   const allCompleted = sets.length > 0 && sets.every((set) => set.completed);
 
   const pendingSetId =
-    (createSet.isPending && null) ||
+    (createSet.isPending &&
+      createSet.variables?.setNumber === sets.length &&
+      "pending") ||
     (updateSet.variables && "setId" in updateSet.variables ? updateSet.variables.setId : null) ||
     (deleteSet.variables ? deleteSet.variables.setId : null) ||
     (completeSet.variables ? completeSet.variables.setId : null) ||

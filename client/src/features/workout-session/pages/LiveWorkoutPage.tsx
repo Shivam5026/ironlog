@@ -1,32 +1,93 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, Navigate, useNavigate } from "react-router-dom";
-import { Loader2, CheckCircle2, Circle, List } from "lucide-react";
+import { Loader2, CheckCircle2, Circle } from "lucide-react";
 
 import { Button } from "@/shared/components/ui/Button";
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/shared/components/ui/Sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/shared/components/ui/Sheet";
 import { ErrorState } from "@/shared/components/ui/ErrorState";
 import { Separator } from "@/shared/components/ui/Separator";
 import { Card, CardContent } from "@/shared/components/ui/Card";
 
 import { useActiveWorkout } from "../hooks/useActiveWorkout";
-import { useRestTimer } from "../hooks/useRestTimer";
+import { useAutoSave } from "../hooks/useAutoSave";
 import { useSessionStore } from "../store/session-store";
+import { useTimerStore } from "../store/timer-store";
 import { SessionHeader } from "../components/SessionHeader";
 import { SessionFooter } from "../components/SessionFooter";
 import { SessionStatistics } from "../components/SessionStatistics";
 import { ActiveExercise } from "../components/ActiveExercise";
 import { WorkoutProgress } from "../components/WorkoutProgress";
+import { RecoveryBanner } from "../components/RecoveryBanner";
+import {
+  SESSION_KEY,
+  readSessionSnapshot,
+  readTimerSnapshot,
+  readRestSnapshot,
+  clearSessionSnapshotForTab,
+} from "../utils/recovery-storage";
 
 export default function LiveWorkoutPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
   const { data: session, isPending, isError, error, pause, resume, finish } = useActiveWorkout(sessionId!);
-  const { startRest } = useRestTimer();
   const activeExerciseId = useSessionStore((state) => state.activeExerciseId);
   const setActiveExercise = useSessionStore((state) => state.setActiveExercise);
+  const setLogs = useSessionStore((state) => state.setLogs);
   const [listOpen, setListOpen] = useState(false);
+  const [isRecovered, setIsRecovered] = useState(() => {
+    // A snapshot surviving only in localStorage means tab close/crash:
+    // sessionStorage is refresh-only and gets cleared by hydration below.
+    const snap = readSessionSnapshot();
+    const inTab = sessionStorage.getItem(SESSION_KEY) !== null;
+    return snap !== null && snap.id === sessionId && !inTab;
+  });
+  const hydratedRef = useRef(false);
 
-  const logs = session?.exerciseLogs ?? [];
+  // Hydrate timers from a local snapshot (refresh / tab-close recovery)
+  const hydrate = useTimerStore((state) => state.hydrate);
+  const startWorkoutTimer = useTimerStore((state) => state.startWorkoutTimer);
+  const pauseWorkoutTimer = useTimerStore((state) => state.pauseWorkoutTimer);
+  const startRest = useTimerStore((state) => state.startRest);
+  const stopRest = useTimerStore((state) => state.stopRest);
+  useEffect(() => {
+    if (hydratedRef.current || !session) return;
+    hydratedRef.current = true;
+    const timer = readTimerSnapshot();
+    const rest = readRestSnapshot();
+    hydrate(timer?.elapsedSeconds ?? 0, rest?.restRemaining ?? 0, timer?.running ?? false);
+    if (timer?.running) {
+      startWorkoutTimer();
+    }
+    if (rest && rest.restRemaining > 0) {
+      startRest(rest.restRemaining);
+    }
+    if (timer || rest) {
+      // Refresh case: the tab-scoped snapshot is consumed here; the
+      // localStorage snapshot stays for tab-close crash recovery.
+      clearSessionSnapshotForTab();
+    }
+  }, [session, hydrate, startWorkoutTimer, startRest]);
+
+  // Persist session + timers to local storage on every change
+  useAutoSave(sessionId ?? "");
+
+  const logs = useMemo(() => session?.exerciseLogs ?? [], [session]);
+
+  // Keep the store's exercise id list in sync so navigator can compute targets.
+  useEffect(() => {
+    setLogs(logs);
+  }, [logs, setLogs]);
+
+  // Keep the wall-clock workout timer in sync with the session status:
+  // runs while ACTIVE, freezes while PAUSED.
+  useEffect(() => {
+    if (!session) return;
+    if (session.status === "ACTIVE") {
+      startWorkoutTimer();
+    } else if (session.status === "PAUSED") {
+      pauseWorkoutTimer();
+    }
+  }, [session?.status, startWorkoutTimer, pauseWorkoutTimer]);
 
   const currentIndex = useMemo(() => {
     if (!session || logs.length === 0) return -1;
@@ -68,7 +129,11 @@ export default function LiveWorkoutPage() {
 
   const handleFinish = () => {
     finish.mutate(undefined, {
-      onSuccess: () => navigate("/dashboard"),
+      onSuccess: () => {
+        stopRest();
+        useTimerStore.getState().pauseWorkoutTimer();
+        navigate(`/dashboard/workout/${session.id}/summary`);
+      },
     });
   };
 
@@ -92,6 +157,13 @@ export default function LiveWorkoutPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
+      {isRecovered && (
+        <RecoveryBanner
+          sessionId={session.id}
+          onDismiss={() => setIsRecovered(false)}
+        />
+      )}
+
       <SessionHeader
         session={session}
         currentIndex={currentIndex}
@@ -115,7 +187,7 @@ export default function LiveWorkoutPage() {
           isPending={finish.isPending}
           onComplete={handleComplete}
           onSkip={handleSkip}
-          onStartRest={(set) => startRest(set.restTime)}
+          onStartRest={startRest}
         />
       )}
 

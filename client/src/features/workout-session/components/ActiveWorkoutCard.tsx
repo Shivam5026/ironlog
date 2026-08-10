@@ -44,9 +44,9 @@ export function ActiveWorkoutCard({ session, onPause, onResume, isPending }: Act
               Pause
             </Button>
           )}
-          <Button variant="outline" asChild>
-            <Link to={`/dashboard/workout/${session.id}`}>Open</Link>
-          </Button>
+          <Link to={`/dashboard/workout/${session.id}`}>
+            <Button variant="outline">Open</Button>
+          </Link>
         </div>
       </CardContent>
     </Card>

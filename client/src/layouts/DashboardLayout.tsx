@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { useState } from "react";
 
 import { DashboardNavbar } from "@/shared/components/dashboard/DashboardNavbar";
@@ -8,9 +8,19 @@ import {
   Sheet,
   SheetContent,
 } from "@/shared/components/ui/Sheet";
+import { RecoveryDialog } from "@/features/workout-session/components/RecoveryDialog";
+import { useRecovery } from "@/features/workout-session/hooks/useRecovery";
 
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
+
+  const { data: activeSession } = useRecovery();
+  const onLiveWorkout = location.pathname.startsWith("/dashboard/workout/");
+  const [dismissed, setDismissed] = useState(false);
+
+  const recoveryOpen =
+    !onLiveWorkout && !dismissed && activeSession != null;
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -38,6 +48,16 @@ export default function DashboardLayout() {
           <Outlet />
         </main>
       </div>
+
+      {activeSession && (
+        <RecoveryDialog
+          sessionId={activeSession.id}
+          open={recoveryOpen}
+          onOpenChange={(open) => {
+            if (!open) setDismissed(true);
+          }}
+        />
+      )}
     </div>
   );
 }
