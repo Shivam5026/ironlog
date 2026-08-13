@@ -105,7 +105,9 @@ async function updateExerciseLog(logId: string, userId: string, data: UpdateExer
               setType: set.setType,
               isWarmup: set.isWarmup ?? set.setType === "WARMUP",
               isFailure: set.isFailure ?? set.setType === "FAILURE",
-              completed: set.completed ?? false,
+              // Preserve existing completion when the payload omits it —
+              // defaulting to false would wipe completed sets on bulk edits.
+              ...(set.completed !== undefined && { completed: set.completed }),
             },
           });
         } else {

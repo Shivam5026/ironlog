@@ -49,7 +49,8 @@ export function useCompleteSet(sessionId: string) {
     mutationFn: ({ setId, completed }: { setId: string; completed?: boolean }) =>
       exerciseLogSetApi.completeSet(setId, completed),
     onSuccess: (set: WorkoutSessionSet) => {
-      patchSetInSession(queryClient, sessionId, set);
+      // Force the server's completed state — this mutation owns the toggle.
+      patchSetInSession(queryClient, sessionId, set, { completed: set.completed });
     },
     onError: (error) => toast.error(error.message),
   });

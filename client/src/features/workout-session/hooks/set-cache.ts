@@ -12,10 +12,20 @@ function writeSession(queryClient: QueryClient, sessionId: string, session: Sess
   queryClient.setQueryData([...queryKeys.workoutSessions, sessionId], session);
 }
 
+/**
+ * Merge a server set response into the session cache.
+ *
+ * `completed` is preserved from the cache unless overridden: an update PATCH
+ * (weight/reps) racing a complete PATCH returns `completed: false` from the
+ * pre-completion server state — replacing the whole set would flip the UI
+ * back to incomplete. The complete mutation forces its own `completed` via
+ * the override.
+ */
 export function patchSetInSession(
   queryClient: QueryClient,
   sessionId: string,
   set: WorkoutSessionSet,
+  overrides: Partial<WorkoutSessionSet> = {},
 ) {
   const session = readSession(queryClient, sessionId);
   if (!session) return;
@@ -27,7 +37,11 @@ export function patchSetInSession(
         ? {
             ...log,
             sets: log.sets
-              .map((s) => (s.id === set.id ? set : s))
+              .map((s) =>
+                s.id === set.id
+                  ? { ...s, ...set, completed: overrides.completed ?? s.completed }
+                  : s,
+              )
               .sort((a, b) => a.setNumber - b.setNumber),
           }
         : log,

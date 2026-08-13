@@ -33,13 +33,16 @@ export function ExerciseLogger({
   const sets = log.sets;
   const allCompleted = sets.length > 0 && sets.every((set) => set.completed);
 
+  // `variables` persists after a mutation settles, so every clause must be
+  // gated on `isPending` — otherwise the last-touched set's action buttons
+  // stay stuck on the spinner (disabled) forever.
   const pendingSetId =
     (createSet.isPending &&
       createSet.variables?.setNumber === sets.length &&
       "pending") ||
-    (updateSet.variables && "setId" in updateSet.variables ? updateSet.variables.setId : null) ||
-    (deleteSet.variables ? deleteSet.variables.setId : null) ||
-    (completeSet.variables ? completeSet.variables.setId : null) ||
+    (updateSet.isPending ? updateSet.variables?.setId ?? null : null) ||
+    (deleteSet.isPending ? deleteSet.variables?.setId ?? null : null) ||
+    (completeSet.isPending ? completeSet.variables?.setId ?? null : null) ||
     null;
 
   const handleAddSet = () => {
