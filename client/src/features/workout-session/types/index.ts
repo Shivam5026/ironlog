@@ -1,3 +1,5 @@
+import type { NewPersonalRecord } from "./performance";
+
 export type WorkoutSessionStatus = "ACTIVE" | "PAUSED" | "COMPLETED" | "ABANDONED";
 
 export type WorkoutSessionSet = {
@@ -83,4 +85,9 @@ export type WorkoutSession = {
     workoutDays: unknown[];
   };
   exerciseLogs: ExerciseLog[];
+};
+
+export type FinishWorkoutResult = {
+  session: WorkoutSession;
+  newPRs: NewPersonalRecord[];
 };

@@ -1,3 +1,5 @@
+import type { NewPersonalRecord } from "./performance";
+
 export type WorkoutSummaryExercise = {
   exerciseId: string;
   exerciseName: string;
@@ -26,6 +28,7 @@ export type WorkoutSummary = {
   totalReps: number;
   totalVolume: number;
   personalRecords: PersonalRecordEntry[];
+  newPRs: NewPersonalRecord[];
   estimatedCalories: number;
   startedAt: string;
   endedAt: string;

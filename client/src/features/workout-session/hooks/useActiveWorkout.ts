@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { queryKeys } from "@/shared/lib/queryKey";
 import { workoutSessionApi } from "../api/workout-session";
+import { showNewPersonalRecordToasts } from "../utils/personalRecords";
 
 export function useActiveWorkout(sessionId: string) {
   const queryClient = useQueryClient();
@@ -31,9 +32,15 @@ export function useActiveWorkout(sessionId: string) {
 
   const finish = useMutation({
     mutationFn: () => workoutSessionApi.finish(sessionId),
-    onSuccess: (session) => {
+    onSuccess: ({ session, newPRs }) => {
       queryClient.setQueryData([...queryKeys.workoutSessions, sessionId], session);
-      toast.success("Workout finished.");
+      queryClient.invalidateQueries({ queryKey: queryKeys.performance });
+
+      if (newPRs.length > 0) {
+        showNewPersonalRecordToasts(newPRs);
+      } else {
+        toast.success("Workout finished.");
+      }
     },
     onError: (error) => toast.error(error.message),
   });

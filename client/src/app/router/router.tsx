@@ -10,7 +10,7 @@ import ProtectedRoute from "@/shared/components/routes/ProtectedRoute";
 import HomePage from "@/pages/HomePage";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
-import DashboardPage from "@/pages/DashboardPage";
+import DashboardPage from "@/features/dashboard/pages/DashboardPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 
 import { ProfilePage } from "@/features/profile/page/ProfilePage";
@@ -109,16 +109,23 @@ export const router = createBrowserRouter([
           {
             path: "workout-history",
             lazy: () =>
-              import("@/features/workout-session/pages/WorkoutHistoryPage").then((m) => ({
-                Component: m.default,
-              })),
+              import("@/features/workout-history/pages/WorkoutHistoryPage").then(
+                (m) => ({ Component: m.default }),
+              ),
           },
           {
             path: "workout-history/:sessionId",
             lazy: () =>
-              import("@/features/workout-session/pages/WorkoutDetailsPage").then((m) => ({
-                Component: m.default,
-              })),
+              import("@/features/workout-history/pages/WorkoutDetailsPage").then(
+                (m) => ({ Component: m.default }),
+              ),
+          },
+          {
+            path: "personal-records",
+            lazy: () =>
+              import("@/features/workout-session/pages/PersonalRecordsPage").then(
+                (m) => ({ Component: m.default }),
+              ),
           },
           {
             path: "exercises",

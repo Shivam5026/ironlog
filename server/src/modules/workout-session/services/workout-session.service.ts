@@ -1,7 +1,10 @@
 import { prisma } from "../../../config/prisma";
 import { ApiError } from "../../../utils/ApiError";
+import { invalidateDashboard } from "../../dashboard/services/dashboard.service";
+import { personalRecordService } from "../../personal-record/services/personal-record.service";
 import { timerService } from "./timer.service";
 import type { StartWorkoutInput } from "../types/workout-session.types";
+import type { NewPersonalRecord } from "../../personal-record/types/personal-record.types";
 
 export const SESSION_INCLUDE = {
   workoutPlan: {
@@ -143,29 +146,44 @@ async function finishWorkout(sessionId: string, userId: string) {
 
   const now = new Date();
 
-  return prisma.$transaction(async (tx) => {
-    const logs = await tx.exerciseLog.findMany({
-      where: { workoutSessionId: sessionId },
-      include: { sets: true },
+  const result = await prisma.$transaction(async (tx) => {
+      const logs = await tx.exerciseLog.findMany({
+        where: { workoutSessionId: sessionId },
+        include: { sets: true },
+      });
+
+      const totalVolume = logs
+        .flatMap((log) => log.sets)
+        .filter((set) => set.completed)
+        .reduce((sum, set) => sum + Number(set.weight) * set.reps, 0);
+
+      return tx.workoutSession.update({
+        where: { id: sessionId },
+        data: {
+          status: "COMPLETED",
+          endedAt: now,
+          duration: timerService.computeElapsedSeconds(session.startedAt, now),
+          totalVolume,
+        },
+        include: SESSION_INCLUDE,
+      });
     });
 
-    const totalVolume = logs
-      .flatMap((log) => log.sets)
-      .filter((set) => set.completed)
-      .reduce((sum, set) => sum + Number(set.weight) * set.reps, 0);
+    await invalidateDashboard(userId);
 
-    return tx.workoutSession.update({
-      where: { id: sessionId },
-      data: {
-        status: "COMPLETED",
-        endedAt: now,
-        duration: timerService.computeElapsedSeconds(session.startedAt, now),
-        totalVolume,
-      },
-      include: SESSION_INCLUDE,
-    });
-  });
-}
+    let newPRs: NewPersonalRecord[] = [];
+    try {
+      newPRs = await personalRecordService.processCompletedWorkout(
+        userId,
+        sessionId,
+      );
+    } catch (error) {
+      // Completing the workout must not fail because PR processing failed.
+      console.error("Failed to process personal records", error);
+    }
+
+    return { session: result, newPRs };
+  }
 
 export const workoutSessionService = {
   getSession,

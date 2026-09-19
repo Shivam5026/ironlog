@@ -1,8 +1,7 @@
 import { prisma } from "../../../config/prisma";
-import { ApiError } from "../../../utils/ApiError";
+import { bestSet, STATS_STATUSES } from "../../../utils/workoutStats";
 import type {
   ExerciseHistoryEntry,
-  PersonalRecord,
   PreviousPerformance,
 } from "../types/performance.types";
 
@@ -33,7 +32,7 @@ async function getCompletedLogs(userId: string, exerciseId?: string) {
       exerciseId,
       workoutSession: {
         userId,
-        status: { in: ["COMPLETED", "ABANDONED"] },
+        status: { in: [...STATS_STATUSES] },
       },
     },
     include: {
@@ -42,25 +41,6 @@ async function getCompletedLogs(userId: string, exerciseId?: string) {
     },
     orderBy: { workoutSession: { startedAt: "desc" } },
   }) as Promise<LogWithSets[]>;
-}
-
-function bestSet(
-  sets: LogWithSets["sets"],
-): { weight: number; reps: number } | null {
-  let best: { weight: number; reps: number } | null = null;
-  // "best" = heaviest completed set, ties broken by more reps
-  for (const set of sets) {
-    if (!set.completed) continue;
-    const weight = Number(set.weight);
-    if (
-      best === null ||
-      weight > best.weight ||
-      (weight === best.weight && set.reps > best.reps)
-    ) {
-      best = { weight, reps: set.reps };
-    }
-  }
-  return best;
 }
 
 async function getPreviousPerformance(userId: string, exerciseId: string) {
@@ -101,59 +81,17 @@ async function getPreviousPerformance(userId: string, exerciseId: string) {
   return result;
 }
 
-async function getPersonalRecords(userId: string) {
-  const logs = await getCompletedLogs(userId);
-
-  const byExercise = new Map<string, { logs: LogWithSets[]; name: string }>();
-
-  for (const log of logs) {
-    const entry = byExercise.get(log.exerciseId);
-    if (entry) {
-      entry.logs.push(log);
-    } else {
-      byExercise.set(log.exerciseId, { logs: [log], name: log.exerciseName });
-    }
-  }
-
-  const records: PersonalRecord[] = [];
-
-  for (const [exerciseId, { logs, name }] of byExercise) {
-    const best = logs
-      .map((log) => bestSet(log.sets))
-      .filter(Boolean)
-      .sort(
-        (a, b) =>
-          (b?.weight ?? 0) - (a?.weight ?? 0) ||
-          (b?.reps ?? 0) - (a?.reps ?? 0),
-      )[0];
-
-    if (!best) continue;
-
-    const lastLog = logs[logs.length - 1];
-
-    records.push({
-      exerciseId,
-      exerciseName: name,
-      bestWeight: best.weight,
-      bestReps: best.reps,
-      estimatedOneRepMax: epleyOneRepMax(best.weight, best.reps),
-      lastPerformedAt: lastLog.workoutSession.startedAt,
-      workoutSessionId: lastLog.workoutSession.id,
-    });
-  }
-
-  records.sort((a, b) => b.lastPerformedAt.getTime() - a.lastPerformedAt.getTime());
-
-  return records;
-}
-
-async function getExerciseHistory(userId: string, exerciseId: string, limit: number) {
+async function getExerciseHistory(
+  userId: string,
+  exerciseId: string,
+  limit: number,
+) {
   const logs = await prisma.exerciseLog.findMany({
     where: {
       exerciseId,
       workoutSession: {
         userId,
-        status: { in: ["COMPLETED", "ABANDONED"] },
+        status: { in: [...STATS_STATUSES] },
       },
     },
     include: {
@@ -182,7 +120,10 @@ async function getExerciseHistory(userId: string, exerciseId: string, limit: num
       startedAt: log.workoutSession.startedAt,
       bestWeight: best?.weight ?? 0,
       bestReps: best?.reps ?? 0,
-      totalVolume: completedSets.reduce((sum, set) => sum + Number(set.weight) * set.reps, 0),
+      totalVolume: completedSets.reduce(
+        (sum, set) => sum + Number(set.weight) * set.reps,
+        0,
+      ),
       totalSets: completedSets.length,
     });
   }
@@ -194,6 +135,5 @@ async function getExerciseHistory(userId: string, exerciseId: string, limit: num
 
 export const performanceService = {
   getPreviousPerformance,
-  getPersonalRecords,
   getExerciseHistory,
 };

@@ -29,6 +29,9 @@ model User {
   workoutTemplates WorkoutTemplate[]
   workoutSessions  WorkoutSession[]
 
+  bodyWeights     BodyWeight[]
+  personalRecords PersonalRecord[]
+
   @@unique([email])
   @@map("user")
 }
@@ -144,7 +147,7 @@ model WorkoutDay {
 
   workoutPlan WorkoutPlan @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade)
 
-  exercises WorkoutPlanExercise[]
+  exercises       WorkoutPlanExercise[]
   workoutSessions WorkoutSession[]
 
   @@unique([workoutPlanId, order])
@@ -199,10 +202,10 @@ model WorkoutSession {
   workoutDayId  String
 
   status      WorkoutSessionStatus @default(ACTIVE)
-  startedAt   DateTime              @default(now())
+  startedAt   DateTime             @default(now())
   endedAt     DateTime?
   duration    Int?
-  totalVolume Decimal? @db.Decimal(10, 2)
+  totalVolume Decimal?             @db.Decimal(10, 2)
 
   workoutPlan WorkoutPlan @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade)
   workoutDay  WorkoutDay  @relation(fields: [workoutDayId], references: [id], onDelete: Cascade)
@@ -220,7 +223,7 @@ model WorkoutSession {
 }
 
 model ExerciseLog {
-  id               String @id @default(cuid())
+  id               String  @id @default(cuid())
   workoutSessionId String
   exerciseId       String
   exerciseName     String
@@ -239,7 +242,7 @@ model ExerciseLog {
 }
 
 model ExerciseLogSet {
-  id            String @id @default(cuid())
+  id            String  @id @default(cuid())
   exerciseLogId String
   setNumber     Int
   weight        Decimal @db.Decimal(8, 2)
@@ -260,8 +263,8 @@ model ExerciseLogSet {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([exerciseLogId])
   @@unique([exerciseLogId, setNumber])
+  @@index([exerciseLogId])
   @@map("exercise_log_set")
 }
 
@@ -324,4 +327,39 @@ model TemplateExercise {
   @@index([templateDayId])
   @@index([exerciseId])
   @@map("template_exercise")
+}
+
+model BodyWeight {
+  id         String   @id @default(cuid())
+  userId     String
+  weight     Decimal  @db.Decimal(6, 2)
+  recordedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, recordedAt])
+  @@map("body_weights")
+}
+
+model PersonalRecord {
+  id                 String   @id @default(cuid())
+  userId             String
+  exerciseId         String
+  exerciseName       String
+  bestWeight         Decimal  @db.Decimal(8, 2)
+  bestVolume         Decimal  @db.Decimal(10, 2)
+  estimatedOneRepMax Decimal  @db.Decimal(8, 2)
+  achievedAt         DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, exerciseId])
+  @@index([userId])
+  @@map("personal_records")
 }

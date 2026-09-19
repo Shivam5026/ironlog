@@ -1,4 +1,4 @@
-import { Bookmark, ClipboardList, Dumbbell, History, Home, User } from "lucide-react";
+import { Bookmark, ClipboardList, Dumbbell, History, Home, Trophy, User } from "lucide-react";
 import type {LucideIcon} from "lucide-react";
 
 export interface DashboardNavItem {
@@ -46,6 +46,13 @@ export const dashboardNavigation: DashboardNavItem[] = [
     icon: History,
     title: "Workout History",
     description: "Review your past workouts.",
+  },
+  {
+    label: "Personal Records",
+    href: "/dashboard/personal-records",
+    icon: Trophy,
+    title: "Personal Records",
+    description: "Your all-time best lifts.",
   },
   {
     label: "Profile",

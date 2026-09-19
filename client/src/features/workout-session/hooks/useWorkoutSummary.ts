@@ -22,6 +22,8 @@ export function useCompleteWorkout(sessionId: string) {
       queryClient.invalidateQueries({
         queryKey: [...queryKeys.workoutSessions, sessionId],
       });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      queryClient.invalidateQueries({ queryKey: queryKeys.workoutHistory });
     },
   });
 }

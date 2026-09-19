@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 import { Card, CardContent } from "@/shared/components/ui/Card";
-import type { RecentTemplate } from "../types";
+import type { RecentTemplate } from "../types/dashboard.types";
 
 interface TemplateCardProps {
   template: RecentTemplate;

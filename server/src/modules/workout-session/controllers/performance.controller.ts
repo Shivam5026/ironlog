@@ -29,21 +29,6 @@ export async function getPreviousPerformance(
   }
 }
 
-export async function getPersonalRecords(req: Request, res: Response, next: NextFunction) {
-  try {
-    const userId = req.session?.userId;
-    if (!userId) {
-      throw new ApiError(401, "Unauthorized");
-    }
-
-    const records = await performanceService.getPersonalRecords(userId);
-
-    return res.status(200).json(new ApiResponse(200, records, "Personal records fetched"));
-  } catch (error) {
-    next(error);
-  }
-}
-
 export async function getExerciseHistory(req: Request, res: Response, next: NextFunction) {
   try {
     const userId = req.session?.userId;

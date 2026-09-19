@@ -76,9 +76,9 @@ export async function finishWorkout(req: Request, res: Response, next: NextFunct
     }
 
     const { id } = sessionIdSchema.parse(req.params);
-    const session = await workoutSessionService.finishWorkout(id, userId);
+    const result = await workoutSessionService.finishWorkout(id, userId);
 
-    return res.status(200).json(new ApiResponse(200, session, "Workout finished"));
+    return res.status(200).json(new ApiResponse(200, result, "Workout finished"));
   } catch (error) {
     next(error);
   }

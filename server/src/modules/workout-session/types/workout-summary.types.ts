@@ -1,3 +1,5 @@
+import type { NewPersonalRecord } from "../../personal-record/types/personal-record.types";
+
 export interface WorkoutSummaryExercise {
   exerciseId: string;
   exerciseName: string;
@@ -26,6 +28,7 @@ export interface WorkoutSummary {
   totalReps: number;
   totalVolume: number;
   personalRecords: PersonalRecordEntry[];
+  newPRs: NewPersonalRecord[];
   estimatedCalories: number;
   startedAt: Date;
   endedAt: Date;

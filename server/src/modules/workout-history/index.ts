@@ -1,0 +1,1 @@
+export { default as workoutHistoryRouter } from "./routes/workout-history.routes";

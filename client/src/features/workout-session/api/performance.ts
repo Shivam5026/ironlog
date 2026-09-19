@@ -15,10 +15,10 @@ export const performanceApi = {
   },
 
   async getPersonalRecords() {
-    const { data } = await api.get<ApiResponse<PersonalRecord[]>>(
-      "/performance/personal-records",
+    const { data } = await api.get<ApiResponse<{ items: PersonalRecord[] }>>(
+      "/personal-records",
     );
-    return data.data;
+    return data.data.items;
   },
 
   async getExerciseHistory(exerciseId: string, limit = 10) {

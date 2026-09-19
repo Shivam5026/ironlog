@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 import { Card, CardContent } from "@/shared/components/ui/Card";
 import { relativeTime } from "@/shared/lib/relativeTime";
-import type { RecentPlan } from "../types";
+import type { RecentPlan } from "../types/dashboard.types";
 
 interface RecentPlanCardProps {
   plan: RecentPlan;

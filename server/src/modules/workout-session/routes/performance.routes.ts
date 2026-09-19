@@ -8,6 +8,5 @@ router.use(requireAuth);
 
 router.get("/exercise/:exerciseId", performanceController.getPreviousPerformance);
 router.get("/history/:exerciseId", performanceController.getExerciseHistory);
-router.get("/personal-records", performanceController.getPersonalRecords);
 
 export default router;

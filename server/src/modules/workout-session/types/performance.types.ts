@@ -7,16 +7,6 @@ export interface PreviousPerformance {
   estimatedOneRepMax: number | null;
 }
 
-export interface PersonalRecord {
-  exerciseId: string;
-  exerciseName: string;
-  bestWeight: number;
-  bestReps: number;
-  lastPerformedAt: Date;
-  estimatedOneRepMax: number | null;
-  workoutSessionId: string | null;
-}
-
 export interface ExerciseHistoryEntry {
   workoutSessionId: string;
   startedAt: Date;

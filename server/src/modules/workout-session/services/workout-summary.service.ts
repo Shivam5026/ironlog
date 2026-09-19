@@ -1,8 +1,15 @@
 import { prisma } from "../../../config/prisma";
 import { ApiError } from "../../../utils/ApiError";
+import { bestSet } from "../../../utils/workoutStats";
 import { timerService } from "./timer.service";
 import { SESSION_INCLUDE } from "./workout-session.service";
-import type { PersonalRecordEntry, WorkoutSummary, WorkoutSummaryExercise } from "../types/workout-summary.types";
+import { personalRecordService } from "../../personal-record/services/personal-record.service";
+import type {
+  PersonalRecordEntry,
+  WorkoutSummary,
+  WorkoutSummaryExercise,
+} from "../types/workout-summary.types";
+import type { NewPersonalRecord } from "../../personal-record/types/personal-record.types";
 
 type LogWithSets = {
   id: string;
@@ -17,22 +24,11 @@ type LogWithSets = {
   }[];
 };
 
-function bestSet(
-  sets: LogWithSets["sets"],
-): { weight: number; reps: number } | null {
-  let best: { weight: number; reps: number } | null = null;
-  for (const set of sets) {
-    if (!set.completed) continue;
-    const weight = Number(set.weight);
-    if (best === null || weight > best.weight || (weight === best.weight && set.reps > best.reps)) {
-      best = { weight, reps: set.reps };
-    }
-  }
-  return best;
-}
-
 export function calculateDuration(startedAt: Date, endedAt: Date): number {
-  return Math.max(0, Math.round((endedAt.getTime() - startedAt.getTime()) / 1000));
+  return Math.max(
+    0,
+    Math.round((endedAt.getTime() - startedAt.getTime()) / 1000),
+  );
 }
 
 export function calculateTotalVolume(logs: LogWithSets[]): number {
@@ -56,7 +52,9 @@ export function estimateCalories(
   completedSets: number,
 ): number {
   const minutes = durationSeconds / 60;
-  return Math.round(0.0175 * 60 * bodyWeightKg * (minutes / 60) * 4 + completedSets * 1.5);
+  return Math.round(
+    0.0175 * 60 * bodyWeightKg * (minutes / 60) * 4 + completedSets * 1.5,
+  );
 }
 
 export function calculateWorkoutSummary(
@@ -69,6 +67,7 @@ export function calculateWorkoutSummary(
   },
   personalRecords: PersonalRecordEntry[] = [],
   estimatedCalories = 0,
+  newPRs: NewPersonalRecord[] = [],
 ): WorkoutSummary {
   const logs = session.logs;
   const totalSets = logs.reduce((sum, log) => sum + log.sets.length, 0);
@@ -82,7 +81,8 @@ export function calculateWorkoutSummary(
   const totalVolume = calculateTotalVolume(logs);
   const totalReps = calculateTotalReps(logs);
   const endedAt = session.endedAt ?? new Date();
-  const duration = session.duration ?? calculateDuration(session.startedAt, endedAt);
+  const duration =
+    session.duration ?? calculateDuration(session.startedAt, endedAt);
 
   const exercises: WorkoutSummaryExercise[] = logs.map((log) => {
     const best = bestSet(log.sets);
@@ -92,7 +92,10 @@ export function calculateWorkoutSummary(
       exerciseName: log.exerciseName,
       bestWeight: best?.weight ?? 0,
       bestReps: best?.reps ?? 0,
-      totalVolume: completedLogSets.reduce((s, set) => s + Number(set.weight) * set.reps, 0),
+      totalVolume: completedLogSets.reduce(
+        (s, set) => s + Number(set.weight) * set.reps,
+        0,
+      ),
       completedSets: completedLogSets.length,
     };
   });
@@ -107,6 +110,7 @@ export function calculateWorkoutSummary(
     totalReps,
     totalVolume,
     personalRecords,
+    newPRs,
     estimatedCalories,
     startedAt: session.startedAt,
     endedAt,
@@ -140,7 +144,10 @@ export async function detectPersonalRecords(
     include: { sets: true },
   });
 
-  const priorBestByExercise = new Map<string, { weight: number; reps: number }>();
+  const priorBestByExercise = new Map<
+    string,
+    { weight: number; reps: number }
+  >();
 
   for (const prior of priorLogs) {
     const best = bestSet(prior.sets);
@@ -161,9 +168,13 @@ export async function detectPersonalRecords(
     const best = bestSet(log.sets);
     if (!best) continue;
 
-    const prior = priorBestByExercise.get(log.exerciseId) ?? { weight: 0, reps: 0 };
+    const prior = priorBestByExercise.get(log.exerciseId) ?? {
+      weight: 0,
+      reps: 0,
+    };
     const isPr =
-      best.weight > prior.weight || (best.weight === prior.weight && best.reps > prior.reps);
+      best.weight > prior.weight ||
+      (best.weight === prior.weight && best.reps > prior.reps);
 
     if (isPr) {
       records.push({
@@ -183,7 +194,12 @@ export async function detectPersonalRecords(
 async function finalizeSession(sessionId: string, userId: string) {
   const session = await prisma.workoutSession.findFirst({
     where: { id: sessionId, userId },
-    include: { exerciseLogs: { include: { sets: true }, orderBy: { exerciseOrder: "asc" } } },
+    include: {
+      exerciseLogs: {
+        include: { sets: true },
+        orderBy: { exerciseOrder: "asc" },
+      },
+    },
   });
 
   if (!session) {
@@ -201,7 +217,9 @@ async function finalizeSession(sessionId: string, userId: string) {
       status: "COMPLETED",
       endedAt: now,
       duration: timerService.computeElapsedSeconds(session.startedAt, now),
-      totalVolume: calculateTotalVolume(session.exerciseLogs as unknown as LogWithSets[]),
+      totalVolume: calculateTotalVolume(
+        session.exerciseLogs as unknown as LogWithSets[],
+      ),
     },
   });
 }
@@ -209,7 +227,12 @@ async function finalizeSession(sessionId: string, userId: string) {
 async function getSessionWithLogs(sessionId: string, userId: string) {
   const session = await prisma.workoutSession.findFirst({
     where: { id: sessionId, userId },
-    include: { exerciseLogs: { include: { sets: true }, orderBy: { exerciseOrder: "asc" } } },
+    include: {
+      exerciseLogs: {
+        include: { sets: true },
+        orderBy: { exerciseOrder: "asc" },
+      },
+    },
   });
 
   if (!session) {
@@ -225,7 +248,23 @@ async function completeWorkout(userId: string, sessionId: string) {
   const withLogs = await getSessionWithLogs(sessionId, userId);
   const logs = withLogs.exerciseLogs as unknown as LogWithSets[];
 
-  const records = await detectPersonalRecords(userId, sessionId, withLogs.startedAt, logs);
+  const records = await detectPersonalRecords(
+    userId,
+    sessionId,
+    withLogs.startedAt,
+    logs,
+  );
+
+  let newPRs: NewPersonalRecord[] = [];
+  try {
+    newPRs = await personalRecordService.processCompletedWorkout(
+      userId,
+      sessionId,
+    );
+  } catch (error) {
+    // PR processing must not fail an already-completed workout.
+    console.error("Failed to process personal records", error);
+  }
 
   const profile = await prisma.profile.findUnique({
     where: { userId },
@@ -242,14 +281,22 @@ async function completeWorkout(userId: string, sessionId: string) {
       logs,
     },
     records,
-    estimateCalories(bodyWeight, withLogs.duration ?? 0, summaryCompletedSets(logs)),
+    estimateCalories(
+      bodyWeight,
+      withLogs.duration ?? 0,
+      summaryCompletedSets(logs),
+    ),
+    newPRs,
   );
 
   return summary;
 }
 
 function summaryCompletedSets(logs: LogWithSets[]): number {
-  return logs.reduce((sum, log) => sum + log.sets.filter((set) => set.completed).length, 0);
+  return logs.reduce(
+    (sum, log) => sum + log.sets.filter((set) => set.completed).length,
+    0,
+  );
 }
 
 async function getWorkoutSummary(sessionId: string, userId: string) {
@@ -267,7 +314,12 @@ async function getWorkoutSummary(sessionId: string, userId: string) {
     });
   }
 
-  const records = await detectPersonalRecords(userId, sessionId, withLogs.startedAt, logs);
+  const records = await detectPersonalRecords(
+    userId,
+    sessionId,
+    withLogs.startedAt,
+    logs,
+  );
 
   const profile = await prisma.profile.findUnique({
     where: { userId },

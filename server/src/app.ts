@@ -19,6 +19,9 @@ import { workoutDayRouter } from "./modules/workout-day";
 import { workoutExerciseRouter } from "./modules/workout-exercise";
 import { templateRouter } from "./modules/template";
 import { dashboardRouter } from "./modules/dashboard";
+import { workoutHistoryRouter } from "./modules/workout-history";
+import { personalRecordRouter } from "./modules/personal-record";
+import { bodyWeightRouter } from "./modules/body-weight";
 import {
   workoutSessionRouter,
   exerciseLogRouter,
@@ -26,7 +29,6 @@ import {
   performanceRouter,
   recoveryRouter,
   workoutSummaryRouter,
-  historyRouter,
 } from "./modules/workout-session";
 
 const app = express();
@@ -65,7 +67,9 @@ app.use("/api/exercise-logs", exerciseLogRouter);
 app.use("/api/exercise-log-sets", exerciseLogSetRouter);
 app.use("/api/performance", performanceRouter);
 app.use("/api/recovery", recoveryRouter);
-app.use("/api/history", historyRouter);
+app.use("/api/workout-history", workoutHistoryRouter);
+app.use("/api/personal-records", personalRecordRouter);
+app.use("/api/body-weight", bodyWeightRouter);
 
 app.use(notFound);
 

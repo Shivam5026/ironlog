@@ -11,10 +11,19 @@ export type PersonalRecord = {
   exerciseId: string;
   exerciseName: string;
   bestWeight: number;
-  bestReps: number;
-  estimatedOneRepMax: number | null;
-  lastPerformedAt: string;
-  workoutSessionId: string | null;
+  bestVolume: number;
+  estimatedOneRepMax: number;
+  achievedAt: string;
+};
+
+export type PersonalRecordMetric = "WEIGHT" | "VOLUME" | "ONE_REP_MAX";
+
+export type NewPersonalRecord = {
+  exerciseId: string;
+  exerciseName: string;
+  type: PersonalRecordMetric;
+  value: number;
+  previousValue: number;
 };
 
 export type ExerciseHistoryEntry = {

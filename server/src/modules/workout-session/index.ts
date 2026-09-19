@@ -4,9 +4,6 @@ export { default as exerciseLogSetRouter } from "./routes/exercise-log-set.route
 export { default as performanceRouter } from "./routes/performance.routes";
 export { default as recoveryRouter } from "./routes/recovery.routes";
 export { default as workoutSummaryRouter } from "./routes/workout-summary.routes";
-export { default as historyRouter } from "./routes/history.routes";
-export * from "./services/history.service";
-export * from "./types/history.types";
 export * from "./validations/workout-session.validation";
 export * from "./validations/exercise-log.validation";
 export * from "./validations/exercise-log-set.validation";

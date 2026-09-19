@@ -1,16 +1,14 @@
 import { api } from "@/shared/lib/axios";
 import type { ApiResponse } from "@/shared/types/ApiResponse";
 import type {
-  DashboardStats,
+  DashboardData,
   RecentPlan,
   RecentTemplate,
-} from "../types";
+} from "../types/dashboard.types";
 
 export const dashboardApi = {
-  async getStats() {
-    const { data } = await api.get<ApiResponse<DashboardStats>>(
-      "/dashboard/stats",
-    );
+  async getDashboard() {
+    const { data } = await api.get<ApiResponse<DashboardData>>("/dashboard");
     return data.data;
   },
 

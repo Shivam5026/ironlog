@@ -1,6 +1,6 @@
 import { api } from "@/shared/lib/axios";
 import type { ApiResponse } from "@/shared/types/ApiResponse";
-import type { WorkoutSession } from "../types";
+import type { FinishWorkoutResult, WorkoutSession } from "../types";
 
 export const workoutSessionApi = {
   async start(workoutPlanId: string, workoutDayId: string) {
@@ -33,7 +33,7 @@ export const workoutSessionApi = {
   },
 
   async finish(id: string) {
-    const { data } = await api.post<ApiResponse<WorkoutSession>>(
+    const { data } = await api.post<ApiResponse<FinishWorkoutResult>>(
       `/workout-sessions/${id}/finish`,
     );
     return data.data;
