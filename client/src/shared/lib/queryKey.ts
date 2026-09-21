@@ -8,4 +8,5 @@ export const queryKeys = {
   recovery: ["recovery"] as const,
   workoutHistory: ["workout-history"] as const,
   dashboard: ["dashboard"] as const,
+  streak: ["streak"] as const,
 };

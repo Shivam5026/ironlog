@@ -3,11 +3,13 @@ import { redis } from "../config/redis";
 export async function getCache<T>(
   key: string
 ): Promise<T | null> {
-  const data = await redis.get(key);
-
-  if (!data) return null;
-
-  return JSON.parse(data) as T;
+  try {
+    const data = await redis.get(key);
+    if (!data) return null;
+    return JSON.parse(data) as T;
+  } catch {
+    return null;
+  }
 }
 
 export async function setCache(
@@ -15,17 +17,23 @@ export async function setCache(
   value: unknown,
   ttl = 3600
 ) {
-  console.log("💾 Saving to Redis:", key);
-
-  await redis.set(key, JSON.stringify(value), {
-    EX: ttl,
-  });
+  try {
+    await redis.set(key, JSON.stringify(value), {
+      EX: ttl,
+    });
+  } catch {
+    // Redis failure should not break the application
+  }
 }
 
 export async function deleteCache(
   key: string
 ) {
-  await redis.del(key);
+  try {
+    await redis.del(key);
+  } catch {
+    // Redis failure should not break the application
+  }
 }
 
 export async function withCache<T>(
@@ -35,18 +43,13 @@ export async function withCache<T>(
 ): Promise<T> {
   const cached = await getCache<T>(key);
 
-   if (cached) {
-    console.log(`🟢 Cache HIT: ${key}`);
+  if (cached) {
     return cached;
   }
-
-  console.log(`🔴 Cache MISS: ${key}`);
 
   const fresh = await fetcher();
 
   await setCache(key, fresh, ttl);
-
-  console.log(`💾 Cached: ${key}`);
 
   return fresh;
 }

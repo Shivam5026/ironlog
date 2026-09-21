@@ -21,6 +21,9 @@ import EditWorkoutPlanPage from "@/features/workout-plans/pages/EditWorkoutPlanP
 import WorkoutPlansPage from "@/features/workout-plans/pages/WorkoutPlansPage";
 import WorkoutPlanDetailsPage from "@/features/workout-plans/pages/WorkoutPlanDetailsPage";
 import LiveWorkoutPage from "@/features/workout-session/pages/LiveWorkoutPage";
+import { BodyWeightPage } from "@/features/body-weight";
+import { StreakPage } from "@/features/streak";
+import { AnalyticsPage } from "@/features/analytics";
 
 export const router = createBrowserRouter([
   {
@@ -119,6 +122,18 @@ export const router = createBrowserRouter([
               import("@/features/workout-history/pages/WorkoutDetailsPage").then(
                 (m) => ({ Component: m.default }),
               ),
+          },
+          {
+            path: "body-weight",
+            element: <BodyWeightPage />,
+          },
+          {
+            path: "streaks",
+            element: <StreakPage />,
+          },
+          {
+            path: "volume",
+            element: <AnalyticsPage />,
           },
           {
             path: "personal-records",

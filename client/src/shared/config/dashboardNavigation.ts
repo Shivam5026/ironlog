@@ -1,4 +1,4 @@
-import { Bookmark, ClipboardList, Dumbbell, History, Home, Trophy, User } from "lucide-react";
+import { Bookmark, BarChart3, ClipboardList, Dumbbell, Flame, History, Home, Scale, Trophy, User } from "lucide-react";
 import type {LucideIcon} from "lucide-react";
 
 export interface DashboardNavItem {
@@ -46,6 +46,27 @@ export const dashboardNavigation: DashboardNavItem[] = [
     icon: History,
     title: "Workout History",
     description: "Review your past workouts.",
+  },
+  {
+    label: "Body Weight",
+    href: "/dashboard/body-weight",
+    icon: Scale,
+    title: "Body Weight",
+    description: "Track your weight over time.",
+  },
+  {
+    label: "Streaks",
+    href: "/dashboard/streaks",
+    icon: Flame,
+    title: "Streaks",
+    description: "Your workout consistency.",
+  },
+  {
+    label: "Volume",
+    href: "/dashboard/volume",
+    icon: BarChart3,
+    title: "Volume",
+    description: "Training volume over time.",
   },
   {
     label: "Personal Records",

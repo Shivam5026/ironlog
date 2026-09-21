@@ -53,7 +53,7 @@ export default function DashboardPage() {
       ) : (
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <TodayWorkoutCard workout={dashboard.todayWorkout} />
-          <WorkoutStreakCard streak={dashboard.streak} />
+          <WorkoutStreakCard />
           <WeeklyProgressCard progress={dashboard.weeklyProgress} />
           <TotalWorkoutsCard total={dashboard.totalWorkouts} />
           <BodyWeightCard weight={dashboard.currentBodyWeight} />

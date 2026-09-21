@@ -24,6 +24,9 @@ export function useCompleteWorkout(sessionId: string) {
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.workoutHistory });
+      queryClient.invalidateQueries({ queryKey: queryKeys.streak });
+      queryClient.invalidateQueries({ queryKey: queryKeys.performance });
+      queryClient.invalidateQueries({ queryKey: ["analytics"] });
     },
   });
 }

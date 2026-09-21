@@ -1,6 +1,7 @@
 import { prisma } from "../../../config/prisma";
 import { ApiError } from "../../../utils/ApiError";
 import { STATS_STATUSES } from "../../../utils/workoutStats";
+import { invalidateDashboard } from "../../dashboard/services/dashboard.service";
 import type {
   NewPersonalRecord,
   PersonalRecordItem,
@@ -234,6 +235,7 @@ async function persistPersonalRecords(
 async function syncPersonalRecords(userId: string): Promise<void> {
   const logs = await getCompletedLogs(userId);
   await persistPersonalRecords(userId, computeGrouped(groupLogs(logs)));
+  await invalidateDashboard(userId);
 }
 
 /**
