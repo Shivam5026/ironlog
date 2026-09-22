@@ -4,8 +4,6 @@
 
 IronLog is a modern fitness application built for gym enthusiasts who want more than a basic tracker. It combines workout planning, live session logging, analytics, and intelligent recommendations in one place.
 
-> 🚧 **Work in progress** — this is an active development project. Some features described below are planned and not yet built.
-
 ---
 
 ## 📖 Table of Contents
@@ -32,9 +30,13 @@ IronLog is a modern fitness application built for gym enthusiasts who want more 
 | Exercise library (ExerciseDB API) | ✅ Done |
 | Dashboard layout & navigation | ✅ Done |
 | UI component library (shadcn-style) | ✅ Done |
-| Workout planner | 🔜 Planned |
-| Live workout mode | 🔜 Planned |
-| Progress tracking & analytics | 🔜 Planned |
+| Workout planner | ✅ Done |
+| Live workout mode | ✅ Done |
+| Workout history | ✅ Done |
+| Body weight tracking | ✅ Done |
+| Personal records & 1RM estimation | ✅ Done |
+| Analytics & charts | ✅ Done |
+| Redis caching layer | ✅ Done |
 | Smart insights & recovery | 🔜 Planned |
 | Progress photos | 🔜 Planned |
 | Achievements | 🔜 Planned |
@@ -57,20 +59,61 @@ IronLog is a modern fitness application built for gym enthusiasts who want more 
 
 **💪 Exercise Library**
 - Browse exercises powered by the ExerciseDB API
-- Full exercise details and instructions
+- Filter by body part, target muscle, and equipment
+- Full exercise details, instructions, and GIF demonstrations
 
-**📊 Dashboard**
-- Responsive layout with sidebar navigation
-- Desktop sidebar + mobile sheet drawer
-- Ready for dashboard widgets
+**📋 Workout Planner**
+- Create and manage multiple workout plans
+- Add workout days with custom ordering
+- Add exercises to days with sets, reps, and rest time configuration
+- Duplicate plans and exercise templates
+- Drag-and-drop reordering for days and exercises
+
+**🏋️ Live Workout Mode**
+- Start a workout session from any plan day
+- Real-time workout timer with pause/resume
+- Track sets with weight, reps, RPE, and failure markers
+- Rest timer between sets
+- Auto-save with local storage backup
+- Complete workout with summary and volume calculation
+
+**📜 Workout History**
+- Infinite-scroll list of completed sessions
+- Filter by date range, plan, and search term
+- Detailed session view with all exercises and sets
+- Compare current workout to previous sessions
+
+**⚖️ Body Weight Tracking**
+- Log daily body weight with timestamps
+- Edit and delete entries
+- Weight history with chart visualization (7d/30d/all)
+- Dashboard integration showing current weight
+
+**🏆 Personal Records & 1RM**
+- Automatic PR detection on workout completion
+- Best weight, best volume, and estimated 1RM per exercise
+- Epley formula for 1RM estimation: `weight * (1 + reps / 30)`
+- PR notifications when a new record is set
+- Per-exercise PR history
+
+**📊 Analytics & Charts**
+- **Training Volume** — Line chart of total weight x reps over time
+- **Workout Frequency** — Bar chart of workouts per week/month
+- **Exercise Distribution** — Horizontal bar chart of most/least performed exercises
+- **Muscle Distribution** — Donut chart of training distribution across Chest, Back, Legs, Shoulders, Arms, Core
+- **Statistics** — Centralized aggregate stats (total volume, sets, reps, avg duration, avg weekly frequency)
+- All charts support 7-day, 30-day, and all-time ranges
+
+**⚡ Performance & Caching**
+- Redis caching for dashboard and exercise lookups (24h TTL)
+- TanStack Query for client-side state with consistent query keys
+- Optimistic updates for live workout mutations
+- Cache invalidation after workout completion, body-weight changes, and PR updates
 
 ### 🔜 Planned
 
-- **Workout Planner** — Create workout plans, choose splits, order exercises via drag-and-drop
-- **Live Workout Mode** — Start sessions, rest timer, track sets/reps/weight, compare to previous workouts
-- **Progress Tracking** — Body weight, personal records, estimated 1RM, training volume
-- **Analytics** — Workout streaks, volume charts, muscle distribution, recovery status
 - **Smart Insights** — Progressive overload recommendations, recovery estimation, weekly reports
+- **Recovery Tracking** — Muscle group recovery status and fatigue scores
 - **Progress Photos** — Upload physique images, timeline view, before/after comparison
 - **Achievements** — First Workout, 7-Day Streak, 100 Workouts, and more
 
@@ -88,14 +131,13 @@ IronLog is a modern fitness application built for gym enthusiasts who want more 
 | [Tailwind CSS](https://tailwindcss.com) (4) | Utility-first styling |
 | [React Router](https://reactrouter.com) (7) | Routing |
 | [TanStack Query](https://tanstack.com/query) (5) | Server state & caching |
-| [Zustand](https://zustand-demo.pmnd.rs) | Global client state |
+| [Zustand](https://zustand-demo.pmnd.rs) | Global client state (workout timer) |
 | [React Hook Form](https://react-hook-form.com) + [Zod](https://zod.dev) | Form validation |
 | [Axios](https://axios-http.com) | HTTP client |
 | [shadcn/ui](https://ui.shadcn.com) + [Base UI](https://base-ui.com) | Component primitives |
+| [Recharts](https://recharts.org) (3) | Charts (volume, frequency, distribution) |
 | [Lucide](https://lucide.dev) | Icons |
-| [Recharts](https://recharts.org) | Charts (planned) |
-| [Framer Motion](https://motion.dev) | Animations (planned) |
-| [DnD Kit](https://dndkit.com) | Drag & drop (planned) |
+| [DnD Kit](https://dndkit.com) | Drag & drop reordering |
 | [next-themes](https://github.com/pacocoursey/next-themes) | Dark/light mode |
 | [Sonner](https://sonner.emilkowal.ski) | Toast notifications |
 
@@ -109,6 +151,7 @@ IronLog is a modern fitness application built for gym enthusiasts who want more 
 | [PostgreSQL](https://www.postgresql.org) | Database |
 | [Prisma ORM](https://www.prisma.io) (7) | Database access & migrations |
 | [Better Auth](https://www.better-auth.com) | Authentication |
+| [Redis](https://redis.io) | Caching layer (dashboard, exercises) |
 | [Helmet](https://helmetjs.github.io) | Security headers |
 | [express-rate-limit](https://express-rate-limit.mintlify.app) | Rate limiting |
 | [Morgan](https://github.com/expressjs/morgan) | HTTP logging |
@@ -118,8 +161,7 @@ IronLog is a modern fitness application built for gym enthusiasts who want more 
 
 ### External Services
 
-- [ExerciseDB API](https://exercisedb.p.rapidapi.com) — Exercise library data
-- [Cloudinary](https://cloudinary.com) — Image hosting for progress photos (planned)
+- [ExerciseDB API](https://exercisedb.p.rapidapi.com) — Exercise library data (cached in Redis for 24h)
 
 ---
 
@@ -132,46 +174,58 @@ ironlog/
 │       ├── app/
 │       │   ├── providers/           # Auth, Query, Router providers
 │       │   └── router/              # Route definitions
-│       ├── assets/                  # Static assets
 │       ├── features/                # Feature-based modules
-│       │   ├── auth/                # Login, register, logout
+│       │   ├── analytics/           # Volume, frequency, exercise & muscle charts
 │       │   │   ├── api/
-│       │   │   ├── components/
+│       │   │   ├── components/      # VolumeChart, WorkoutFrequencyChart, etc.
 │       │   │   ├── hooks/
-│       │   │   ├── schemas/
+│       │   │   ├── pages/
 │       │   │   └── types/
+│       │   ├── auth/                # Login, register, logout
+│       │   ├── body-weight/         # Weight logging, history, chart
+│       │   ├── dashboard/           # Dashboard page & widgets
+│       │   ├── exercise/            # Exercise library, filters, details
+│       │   ├── streak/              # Streak summary & page
+│       │   ├── workout-exercises/   # Exercise CRUD within plan days
+│       │   ├── workout-history/     # Session list, details, filters
+│       │   ├── workout-plans/       # Plan CRUD, exercise picker
+│       │   ├── workout-session/     # Live workout, sets, timer, completion
+│       │   ├── workout-days/        # Day CRUD within plans
+│       │   ├── templates/           # Workout templates
 │       │   └── profile/             # Profile management
-│       │       ├── api/
-│       │       ├── components/
-│       │       ├── hooks/
-│       │       ├── page/
-│       │       ├── schemas/
-│       │       └── types/
-│       ├── layouts/                 # Root, Auth, Dashboard layouts
-│       ├── pages/                   # Top-level route pages
-│       └── shared/                  # Shared UI & utilities
-│           ├── components/
-│           │   ├── common/          # Spinner, FullPageLoader
-│           │   ├── dashboard/       # Sidebar, Navbar
-│           │   ├── navigation/      # Navbar
-│           │   ├── routes/          # ProtectedRoute, GuestRoute
-│           │   └── ui/              # shadcn-style primitives
-│           ├── config/
-│           ├── hooks/
-│           ├── lib/                 # Axios, auth client, query client
-│           └── types/
+│       ├── shared/                  # Shared UI & utilities
+│       │   ├── components/ui/       # shadcn-style primitives
+│       │   ├── config/              # Navigation, query keys
+│       │   ├── lib/                 # Axios, auth client, query client, cache
+│       │   └── types/
+│       └── layouts/                 # Root, Auth, Dashboard layouts
 │
 ├── server/                          # Express backend
 │   └── src/
-│       ├── config/                  # Env, Prisma, DB config
-│       ├── generated/prisma/        # Auto-generated Prisma client
+│       ├── config/                  # Env, Prisma, Redis config
+│       ├── lib/                     # Cache utilities (withCache, getCache, setCache)
 │       ├── middlewares/             # auth, validate, rateLimiter, errorHandler
 │       ├── modules/                 # Feature-based modules
+│       │   ├── analytics/           # Volume, frequency, exercise/muscle distribution, statistics
+│       │   │   ├── controllers/
+│       │   │   ├── routes/
+│       │   │   ├── services/
+│       │   │   ├── types/
+│       │   │   └── validations/
 │       │   ├── auth/                # Better Auth setup
-│       │   ├── exercise/            # ExerciseDB API integration
-│       │   └── profile/             # Profile CRUD
-│       ├── types/                   # Express type extensions
-│       └── utils/                   # ApiError, ApiResponse, asyncHandler
+│       │   ├── body-weight/         # Weight CRUD with dashboard cache invalidation
+│       │   ├── dashboard/           # Dashboard aggregation with Redis caching
+│       │   ├── exercise/            # ExerciseDB API integration with Redis caching
+│       │   ├── personal-record/     # PR computation, 1RM estimation, sync
+│       │   ├── profile/             # Profile CRUD
+│       │   ├── streak/              # Streak calculation (current, longest, active days)
+│       │   ├── workout-day/         # Workout day CRUD
+│       │   ├── workout-exercise/    # Exercise CRUD within days
+│       │   ├── workout-plan/        # Workout plan CRUD
+│       │   ├── workout-session/     # Session lifecycle, sets, completion, recovery
+│       │   └── workout-template/    # Template CRUD
+│       ├── utils/                   # ApiError, ApiResponse, asyncHandler, workoutStats
+│       └── types/                   # Express type extensions
 │
 ├── docs/                            # Project documentation
 └── README.md
@@ -185,8 +239,8 @@ ironlog/
 
 - [Node.js](https://nodejs.org) (v18+)
 - [PostgreSQL](https://www.postgresql.org) database
+- [Redis](https://redis.io) instance
 - An [ExerciseDB API](https://rapidapi.com/justin-WFnsXH_t5/api/exercisedb) key (free tier)
-- A [Cloudinary](https://cloudinary.com) account (for progress photos — optional for now)
 
 ### Clone & Install
 
@@ -206,10 +260,10 @@ cd ../client && npm install
 ```bash
 cd server
 
-# Create the database
+# Run migrations
 npx prisma migrate dev
 
-# (Or run existing migrations)
+# (Or push schema to database)
 npx prisma db push
 ```
 
@@ -243,11 +297,7 @@ BETTER_AUTH_URL=http://localhost:5000
 
 EXERCISE_DB_API_KEY=your-rapidapi-key
 
-# Optional (for future features)
-REDIS_URL=
-CLOUDINARY_CLOUD_NAME=
-CLOUDINARY_API_KEY=
-CLOUDINARY_API_SECRET=
+REDIS_URL=redis://localhost:6379
 ```
 
 ---
@@ -258,9 +308,20 @@ CLOUDINARY_API_SECRET=
 | --- | --- | --- |
 | Auth | `POST /api/auth/*` (Better Auth) | ✅ |
 | Profile | `GET/PUT /api/profile` | ✅ |
-| Exercises | `GET /api/exercises` | ✅ |
-
-Detailed API documentation is in [docs/API_SPECIFICATION.md](docs/API_SPECIFICATION.md) *(planned)*.
+| Exercises | `GET /api/exercises`, body-parts, target-muscles, equipments, `/:id` | ✅ |
+| Workout Plans | `GET/POST /api/workout-plans`, `GET/PUT/DELETE /:id`, `/:id/duplicate` | ✅ |
+| Workout Days | `GET/POST /api/workout-days?planId=`, `PUT/DELETE /:id`, `/reorder` | ✅ |
+| Workout Exercises | `GET/POST /api/workout-exercises?dayId=`, `PUT/DELETE /:id`, `/reorder`, `/:id/replace` | ✅ |
+| Templates | `GET/POST /api/templates`, `PUT/DELETE /:id`, `/:id/use` | ✅ |
+| Workout Sessions | `POST /start`, `GET /:id`, `PUT /:id/pause`, `/resume`, `/finish` | ✅ |
+| Workout Summary | `GET /:id/summary`, `POST /:id/complete` | ✅ |
+| Sets | `POST /:id/sets`, `PUT/DELETE /sets/:setId`, `/:id/sets/reorder` | ✅ |
+| Exercise Logs | `POST /:id/exercise-logs`, `PUT/DELETE /exercise-logs/:logId` | ✅ |
+| Body Weight | `GET/POST /api/body-weight`, `PUT/DELETE /:id` | ✅ |
+| Personal Records | `GET /api/personal-records`, `GET /:exerciseId` | ✅ |
+| Streak | `GET /api/streak` | ✅ |
+| Dashboard | `GET /api/dashboard`, `/stats`, `/recent-plans`, `/recent-templates` | ✅ |
+| Analytics | `GET /api/analytics/statistics`, `/volume`, `/frequency`, `/exercise-distribution`, `/muscle-distribution` | ✅ |
 
 ---
 
@@ -287,23 +348,31 @@ Project docs live in the `docs/` directory:
 - [x] UI component library
 - [x] Dashboard layout & routing
 
-### Phase 2 — Core Features 🔄
-- [x] Exercise Library (ExerciseDB API)
+### Phase 2 — Core Features ✅
+- [x] Exercise Library (ExerciseDB API with Redis caching)
 - [x] Profile management
-- [ ] Workout Planner
-- [ ] Workout Builder with exercise search
+- [x] Workout Planner (plans, days, exercises, templates)
+- [x] Workout Builder with exercise search & drag-and-drop
 
-### Phase 3 — Training
-- [ ] Live Workout Tracking
-- [ ] Workout History
-- [ ] Dashboard widgets
+### Phase 3 — Training ✅
+- [x] Live Workout Tracking (timer, sets, rest timer, auto-save)
+- [x] Workout History (infinite scroll, filters, session details)
+- [x] Dashboard widgets (streak, weekly progress, last workout)
 
-### Phase 4 — Analytics
-- [ ] Progress charts & metrics
-- [ ] Recovery tracking
-- [ ] Smart Insights
+### Phase 4 — Analytics ✅
+- [x] Training volume charts (line chart, 7d/30d/all)
+- [x] Workout frequency charts (bar chart, weekly/monthly)
+- [x] Exercise distribution (horizontal bar chart, most/least performed)
+- [x] Muscle distribution (donut chart, 6 categories)
+- [x] Statistics service (total volume, sets, reps, avg duration, avg frequency)
+- [x] Body weight tracking & chart
+- [x] Personal records & 1RM estimation
+- [x] Redis caching layer for dashboard & exercises
+- [x] TanStack Query integration with consistent query keys & invalidation
 
-### Phase 5 — Polish
+### Phase 5 — Polish 🔜
+- [ ] Smart Insights — Progressive overload recommendations
+- [ ] Recovery Tracking — Muscle group recovery status
 - [ ] Progress Photos (Cloudinary)
 - [ ] Achievements system
 - [ ] Performance optimization
@@ -311,21 +380,21 @@ Project docs live in the `docs/` directory:
 
 ---
 
-## 🧮 Core Algorithms *(Planned)*
+## 🧮 Core Algorithms
 
-- Estimated One Rep Max (Epley Formula)
-- Training Volume Calculation
-- Progressive Overload Detection
-- Workout Streak Tracking
-- Recovery Estimation
-- Muscle Group Distribution
+- [x] **Estimated One Rep Max (Epley Formula)** — `1RM = weight * (1 + reps / 30)`
+- [x] **Training Volume Calculation** — Sum of `weight * reps` across all completed sets
+- [x] **Workout Streak Tracking** — Consecutive calendar days with completed sessions
+- [x] **Muscle Group Distribution** — Exercise metadata mapped to 6 categories (Chest, Back, Legs, Shoulders, Arms, Core)
+- [ ] Progressive Overload Detection — Planned
+- [ ] Recovery Estimation — Planned
 
 ---
 
 ## 🔒 Security
 
 - Better Auth for authentication & session management
-- Protected API routes
+- Protected API routes with ownership validation
 - Input validation (Zod)
 - CORS protection
 - Helmet security headers
