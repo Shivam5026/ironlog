@@ -115,7 +115,7 @@ export function VolumeChart() {
     );
   }
 
-  const chartData = data?.data ?? [];
+  const chartData = data?.daily ?? [];
 
   if (chartData.length === 0) {
     return (

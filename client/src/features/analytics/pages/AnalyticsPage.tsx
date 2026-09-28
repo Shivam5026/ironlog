@@ -1,10 +1,16 @@
+import { useEffect } from "react";
 import { BarChart3, Activity, Dumbbell, Target } from "lucide-react";
 import { VolumeChart } from "../components/VolumeChart";
 import { WorkoutFrequencyChart } from "../components/WorkoutFrequencyChart";
 import { ExerciseDistributionChart } from "../components/ExerciseDistributionChart";
 import { MuscleDistributionChart } from "../components/MuscleDistributionChart";
+import { prefetchAnalyticsDashboard } from "../hooks/prefetch-analytics";
 
 export default function AnalyticsPage() {
+  useEffect(() => {
+    prefetchAnalyticsDashboard();
+  }, []);
+
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       <div className="space-y-1">

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { bodyWeightApi } from "../api/body-weight";
+import { invalidateBodyWeightAnalytics } from "../../analytics/hooks/invalidate-analytics";
 import type {
   CreateBodyWeightPayload,
   UpdateBodyWeightPayload,
@@ -22,6 +23,7 @@ export function useBodyWeight() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      invalidateBodyWeightAnalytics();
       toast.success("Weight logged.");
     },
     onError: (error) => {
@@ -40,6 +42,7 @@ export function useBodyWeight() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      invalidateBodyWeightAnalytics();
       toast.success("Weight updated.");
     },
     onError: (error) => {
@@ -52,6 +55,7 @@ export function useBodyWeight() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      invalidateBodyWeightAnalytics();
       toast.success("Weight entry deleted.");
     },
     onError: (error) => {

@@ -24,6 +24,7 @@ import { personalRecordRouter } from "./modules/personal-record";
 import { bodyWeightRouter } from "./modules/body-weight";
 import { streakRouter } from "./modules/streak";
 import { analyticsRouter } from "./modules/analytics";
+import { reportsRouter } from "./modules/reports";
 import {
   workoutSessionRouter,
   exerciseLogRouter,
@@ -74,6 +75,7 @@ app.use("/api/personal-records", personalRecordRouter);
 app.use("/api/body-weight", bodyWeightRouter);
 app.use("/api/streak", streakRouter);
 app.use("/api/analytics", analyticsRouter);
+app.use("/api/reports", reportsRouter);
 
 app.use(notFound);
 

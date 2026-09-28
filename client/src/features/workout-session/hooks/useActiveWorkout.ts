@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { queryKeys } from "@/shared/lib/queryKey";
 import { workoutSessionApi } from "../api/workout-session";
 import { showNewPersonalRecordToasts } from "../utils/personalRecords";
+import { invalidateWorkoutAnalytics, invalidatePersonalRecordAnalytics } from "../../analytics/hooks/invalidate-analytics";
 
 export function useActiveWorkout(sessionId: string) {
   const queryClient = useQueryClient();
@@ -35,8 +36,13 @@ export function useActiveWorkout(sessionId: string) {
     onSuccess: ({ session, newPRs }) => {
       queryClient.setQueryData([...queryKeys.workoutSessions, sessionId], session);
       queryClient.invalidateQueries({ queryKey: queryKeys.performance });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      queryClient.invalidateQueries({ queryKey: queryKeys.workoutHistory });
+      queryClient.invalidateQueries({ queryKey: queryKeys.streak });
+      invalidateWorkoutAnalytics();
 
       if (newPRs.length > 0) {
+        invalidatePersonalRecordAnalytics();
         showNewPersonalRecordToasts(newPRs);
       } else {
         toast.success("Workout finished.");

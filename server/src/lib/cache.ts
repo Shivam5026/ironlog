@@ -36,6 +36,23 @@ export async function deleteCache(
   }
 }
 
+export async function deleteCacheByPattern(
+  pattern: string
+) {
+  try {
+    let cursor: string | undefined;
+    do {
+      const result = await redis.scan(cursor ?? "0", { MATCH: pattern, COUNT: 100 });
+      cursor = result.cursor;
+      if (result.keys.length > 0) {
+        await redis.del(result.keys);
+      }
+    } while (cursor !== "0");
+  } catch {
+    // Redis failure should not break the application
+  }
+}
+
 export async function withCache<T>(
   key: string,
   fetcher: () => Promise<T>,

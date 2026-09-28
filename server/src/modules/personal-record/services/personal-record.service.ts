@@ -2,6 +2,7 @@ import { prisma } from "../../../config/prisma";
 import { ApiError } from "../../../utils/ApiError";
 import { STATS_STATUSES } from "../../../utils/workoutStats";
 import { invalidateDashboard } from "../../dashboard/services/dashboard.service";
+import { calculateEstimatedOneRepMax } from "../../analytics/utils/oneRepMax";
 import type {
   NewPersonalRecord,
   PersonalRecordItem,
@@ -43,17 +44,8 @@ function roundTo2(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
-/**
- * Epley formula: 1RM = weight * (1 + reps / 30).
- * Returns null when the estimate is not meaningful (missing weight or reps).
- */
-export function estimateOneRepMax(
-  weight: number,
-  reps: number,
-): number | null {
-  if (weight <= 0 || reps <= 0) return null;
-  return roundTo2(weight * (1 + reps / 30));
-}
+/** Local alias for backward compatibility */
+const estimateOneRepMax = calculateEstimatedOneRepMax;
 
 async function getCompletedLogs(
   userId: string,

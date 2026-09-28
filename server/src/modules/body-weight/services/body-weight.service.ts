@@ -1,5 +1,6 @@
 import { prisma } from "../../../config/prisma";
 import { invalidateDashboard } from "../../dashboard/services/dashboard.service";
+import { invalidateUserAnalytics } from "../../analytics/services/cache-invalidation.service";
 import { ApiError } from "../../../utils/ApiError";
 import type {
   BodyWeightEntry,
@@ -60,6 +61,7 @@ async function createBodyWeight(
   });
 
   await invalidateDashboard(userId);
+  await invalidateUserAnalytics(userId);
 
   return toEntry(record);
 }
@@ -93,6 +95,7 @@ async function updateBodyWeight(
   });
 
   await invalidateDashboard(userId);
+  await invalidateUserAnalytics(userId);
 
   return toEntry(record);
 }
@@ -106,6 +109,7 @@ async function deleteBodyWeight(
   await prisma.bodyWeight.delete({ where: { id: weightId } });
 
   await invalidateDashboard(userId);
+  await invalidateUserAnalytics(userId);
 }
 
 export const bodyWeightService = {

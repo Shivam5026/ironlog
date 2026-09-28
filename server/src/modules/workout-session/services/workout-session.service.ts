@@ -1,6 +1,7 @@
 import { prisma } from "../../../config/prisma";
 import { ApiError } from "../../../utils/ApiError";
 import { invalidateDashboard } from "../../dashboard/services/dashboard.service";
+import { invalidateUserAnalytics } from "../../analytics/services/cache-invalidation.service";
 import { personalRecordService } from "../../personal-record/services/personal-record.service";
 import { timerService } from "./timer.service";
 import type { StartWorkoutInput } from "../types/workout-session.types";
@@ -170,6 +171,7 @@ async function finishWorkout(sessionId: string, userId: string) {
     });
 
     await invalidateDashboard(userId);
+    await invalidateUserAnalytics(userId);
 
     let newPRs: NewPersonalRecord[] = [];
     try {

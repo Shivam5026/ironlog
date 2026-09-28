@@ -3,6 +3,8 @@ import { ApiError } from "../../../utils/ApiError";
 import { bestSet } from "../../../utils/workoutStats";
 import { timerService } from "./timer.service";
 import { SESSION_INCLUDE } from "./workout-session.service";
+import { invalidateDashboard } from "../../dashboard/services/dashboard.service";
+import { invalidateUserAnalytics } from "../../analytics/services/cache-invalidation.service";
 import { personalRecordService } from "../../personal-record/services/personal-record.service";
 import type {
   PersonalRecordEntry,
@@ -244,6 +246,9 @@ async function getSessionWithLogs(sessionId: string, userId: string) {
 
 async function completeWorkout(userId: string, sessionId: string) {
   const completed = await finalizeSession(sessionId, userId);
+
+  await invalidateDashboard(userId);
+  await invalidateUserAnalytics(userId);
 
   const withLogs = await getSessionWithLogs(sessionId, userId);
   const logs = withLogs.exerciseLogs as unknown as LogWithSets[];
