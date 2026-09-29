@@ -9,15 +9,17 @@ async function bootstrap() {
     await prisma.$connect();
 
     console.log("✅ PostgreSQL Connected");
-
-    await connectRedis();
-    app.listen(PORT, () => {
-      console.log(`🚀 Server started on ${PORT}`);
-    });
   } catch (error) {
-    console.error(error);
+    console.error("Failed to connect to PostgreSQL:", error);
     process.exit(1);
   }
+
+  // Redis is optional — the app runs without it (falls back to PostgreSQL)
+  await connectRedis();
+
+  app.listen(PORT, () => {
+    console.log(`🚀 Server started on ${PORT}`);
+  });
 }
 
 bootstrap();

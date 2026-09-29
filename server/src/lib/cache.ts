@@ -1,8 +1,9 @@
-import { redis } from "../config/redis";
+import { redis, isRedisAvailable } from "../config/redis";
 
 export async function getCache<T>(
   key: string
 ): Promise<T | null> {
+  if (!isRedisAvailable()) return null;
   try {
     const data = await redis.get(key);
     if (!data) return null;
@@ -17,6 +18,7 @@ export async function setCache(
   value: unknown,
   ttl = 3600
 ) {
+  if (!isRedisAvailable()) return;
   try {
     await redis.set(key, JSON.stringify(value), {
       EX: ttl,
@@ -29,6 +31,7 @@ export async function setCache(
 export async function deleteCache(
   key: string
 ) {
+  if (!isRedisAvailable()) return;
   try {
     await redis.del(key);
   } catch {
@@ -39,6 +42,7 @@ export async function deleteCache(
 export async function deleteCacheByPattern(
   pattern: string
 ) {
+  if (!isRedisAvailable()) return;
   try {
     let cursor: string | undefined;
     do {
