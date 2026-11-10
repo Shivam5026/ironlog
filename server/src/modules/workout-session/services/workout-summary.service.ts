@@ -5,6 +5,12 @@ import { timerService } from "./timer.service";
 import { SESSION_INCLUDE } from "./workout-session.service";
 import { invalidateDashboard } from "../../dashboard/services/dashboard.service";
 import { invalidateUserAnalytics } from "../../analytics/services/cache-invalidation.service";
+import { invalidateRecoveryCache } from "../../recovery/services/recovery-cache.service";
+import { invalidateOvertrainingCache } from "../../recovery/services/overtraining.service";
+import {
+  invalidateRecoveryReports,
+  invalidateRecoveryTrends,
+} from "../../recovery/services/recovery-analytics.service";
 import { personalRecordService } from "../../personal-record/services/personal-record.service";
 import type {
   PersonalRecordEntry,
@@ -249,6 +255,10 @@ async function completeWorkout(userId: string, sessionId: string) {
 
   await invalidateDashboard(userId);
   await invalidateUserAnalytics(userId);
+  await invalidateRecoveryCache(userId);
+  await invalidateOvertrainingCache(userId);
+  await invalidateRecoveryTrends(userId);
+  await invalidateRecoveryReports(userId);
 
   const withLogs = await getSessionWithLogs(sessionId, userId);
   const logs = withLogs.exerciseLogs as unknown as LogWithSets[];

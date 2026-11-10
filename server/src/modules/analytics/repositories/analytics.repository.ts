@@ -200,10 +200,10 @@ export class AnalyticsRepository {
           select: {
             exerciseId: true,
             exerciseName: true,
-            sets: {
-              where: { completed: true },
-              select: { weight: true, reps: true },
-            },
+        sets: {
+          where: { completed: true },
+          select: { weight: true, reps: true, setType: true },
+        },
           },
         },
       },
@@ -334,7 +334,10 @@ export class AnalyticsRepository {
         },
         sets: {
           where: { completed: true },
-          select: { weight: true, reps: true },
+          // setType is required by the recovery engine (Features 1.1/1.2) to
+          // tell working sets apart from warmup sets; rpe feeds the fatigue
+          // model (Feature 2.1) when intensity data is available.
+          select: { weight: true, reps: true, setType: true, rpe: true },
         },
       },
       orderBy: { workoutSession: { endedAt: "asc" } },

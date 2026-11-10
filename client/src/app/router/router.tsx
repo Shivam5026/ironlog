@@ -22,8 +22,10 @@ import WorkoutPlansPage from "@/features/workout-plans/pages/WorkoutPlansPage";
 import WorkoutPlanDetailsPage from "@/features/workout-plans/pages/WorkoutPlanDetailsPage";
 import LiveWorkoutPage from "@/features/workout-session/pages/LiveWorkoutPage";
 import { BodyWeightPage } from "@/features/body-weight";
+import { ProgressPhotosPage } from "@/features/progress-photos";
 import { StreakPage } from "@/features/streak";
 import { AnalyticsPage } from "@/features/analytics";
+import { RecoveryDashboardPage } from "@/features/recovery";
 
 export const router = createBrowserRouter([
   {
@@ -128,12 +130,20 @@ export const router = createBrowserRouter([
             element: <BodyWeightPage />,
           },
           {
+            path: "progress-photos",
+            element: <ProgressPhotosPage />,
+          },
+          {
             path: "streaks",
             element: <StreakPage />,
           },
           {
             path: "volume",
             element: <AnalyticsPage />,
+          },
+          {
+            path: "recovery",
+            element: <RecoveryDashboardPage />,
           },
           {
             path: "personal-records",

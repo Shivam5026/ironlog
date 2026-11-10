@@ -6,7 +6,9 @@ export const queryKeys = {
   workoutSummary: ["workout-summary"] as const,
   performance: ["performance"] as const,
   recovery: ["recovery"] as const,
+  recoveryRecommendations: ["recovery", "recommendations"] as const,
   workoutHistory: ["workout-history"] as const,
   dashboard: ["dashboard"] as const,
   streak: ["streak"] as const,
+  progressPhotos: ["progress-photos"] as const,
 };

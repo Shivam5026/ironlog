@@ -22,6 +22,7 @@ import { dashboardRouter } from "./modules/dashboard";
 import { workoutHistoryRouter } from "./modules/workout-history";
 import { personalRecordRouter } from "./modules/personal-record";
 import { bodyWeightRouter } from "./modules/body-weight";
+import { progressPhotoRouter } from "./modules/progress-photo";
 import { streakRouter } from "./modules/streak";
 import { analyticsRouter } from "./modules/analytics";
 import { reportsRouter } from "./modules/reports";
@@ -30,9 +31,10 @@ import {
   exerciseLogRouter,
   exerciseLogSetRouter,
   performanceRouter,
-  recoveryRouter,
+  sessionRecoveryRouter,
   workoutSummaryRouter,
 } from "./modules/workout-session";
+import { recoveryEngineRouter } from "./modules/recovery";
 
 const app = express();
 
@@ -69,10 +71,12 @@ app.use("/api/workout-sessions", workoutSummaryRouter);
 app.use("/api/exercise-logs", exerciseLogRouter);
 app.use("/api/exercise-log-sets", exerciseLogSetRouter);
 app.use("/api/performance", performanceRouter);
-app.use("/api/recovery", recoveryRouter);
+app.use("/api/recovery/session", sessionRecoveryRouter);
+app.use("/api/recovery", recoveryEngineRouter);
 app.use("/api/workout-history", workoutHistoryRouter);
 app.use("/api/personal-records", personalRecordRouter);
 app.use("/api/body-weight", bodyWeightRouter);
+app.use("/api/progress-photos", progressPhotoRouter);
 app.use("/api/streak", streakRouter);
 app.use("/api/analytics", analyticsRouter);
 app.use("/api/reports", reportsRouter);

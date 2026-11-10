@@ -31,6 +31,7 @@ model User {
 
   bodyWeights     BodyWeight[]
   personalRecords PersonalRecord[]
+  progressPhotos  ProgressPhoto[]
 
   @@unique([email])
   @@map("user")
@@ -362,4 +363,31 @@ model PersonalRecord {
   @@unique([userId, exerciseId])
   @@index([userId])
   @@map("personal_records")
+}
+
+enum ProgressPhotoCategory {
+  FRONT
+  BACK
+  LEFT_SIDE
+  RIGHT_SIDE
+  CUSTOM
+}
+
+model ProgressPhoto {
+  id                 String                @id @default(cuid())
+  userId             String
+  imageUrl           String
+  cloudinaryPublicId String
+  category           ProgressPhotoCategory
+  weight             Decimal?              @db.Decimal(6, 2)
+  notes              String?
+  recordedAt         DateTime              @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, recordedAt])
+  @@map("progress_photos")
 }

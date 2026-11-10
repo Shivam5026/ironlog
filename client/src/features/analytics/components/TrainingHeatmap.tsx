@@ -5,7 +5,19 @@ import { ErrorState } from "@/shared/components/ui/ErrorState";
 import { useMuscleHeatmap } from "../hooks/useMuscleHeatmap";
 import type { MuscleFrequencyRange } from "../types/analytics.types";
 
-const MUSCLES = ["Chest", "Back", "Legs", "Shoulders", "Arms", "Core"] as const;
+const MUSCLES = [
+  "Chest",
+  "Back",
+  "Legs",
+  "Shoulders",
+  "Biceps",
+  "Triceps",
+  "Forearms",
+  "Core",
+  "Glutes",
+  "Hamstrings",
+  "Calves",
+] as const;
 
 const WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
@@ -14,8 +26,13 @@ const MUSCLE_COLORS: Record<string, string> = {
   Back: "bg-emerald-500",
   Legs: "bg-violet-500",
   Shoulders: "bg-amber-500",
-  Arms: "bg-rose-500",
+  Biceps: "bg-rose-500",
+  Triceps: "bg-orange-500",
+  Forearms: "bg-teal-500",
   Core: "bg-cyan-500",
+  Glutes: "bg-pink-500",
+  Hamstrings: "bg-indigo-500",
+  Calves: "bg-lime-500",
 };
 
 function getIntensityClass(freq: number, maxFreq: number): string {

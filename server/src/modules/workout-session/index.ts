@@ -2,7 +2,7 @@ export { default as workoutSessionRouter } from "./routes/workout-session.routes
 export { default as exerciseLogRouter } from "./routes/exercise-log.routes";
 export { default as exerciseLogSetRouter } from "./routes/exercise-log-set.routes";
 export { default as performanceRouter } from "./routes/performance.routes";
-export { default as recoveryRouter } from "./routes/recovery.routes";
+export { default as sessionRecoveryRouter } from "./routes/recovery.routes";
 export { default as workoutSummaryRouter } from "./routes/workout-summary.routes";
 export * from "./validations/workout-session.validation";
 export * from "./validations/exercise-log.validation";

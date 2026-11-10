@@ -2,6 +2,12 @@ import { prisma } from "../../../config/prisma";
 import { ApiError } from "../../../utils/ApiError";
 import { invalidateDashboard } from "../../dashboard/services/dashboard.service";
 import { invalidateUserAnalytics } from "../../analytics/services/cache-invalidation.service";
+import { invalidateRecoveryCache } from "../../recovery/services/recovery-cache.service";
+import { invalidateOvertrainingCache } from "../../recovery/services/overtraining.service";
+import {
+  invalidateRecoveryReports,
+  invalidateRecoveryTrends,
+} from "../../recovery/services/recovery-analytics.service";
 import { personalRecordService } from "../../personal-record/services/personal-record.service";
 import { timerService } from "./timer.service";
 import type { StartWorkoutInput } from "../types/workout-session.types";
@@ -172,6 +178,10 @@ async function finishWorkout(sessionId: string, userId: string) {
 
     await invalidateDashboard(userId);
     await invalidateUserAnalytics(userId);
+    await invalidateRecoveryCache(userId);
+    await invalidateOvertrainingCache(userId);
+    await invalidateRecoveryTrends(userId);
+    await invalidateRecoveryReports(userId);
 
     let newPRs: NewPersonalRecord[] = [];
     try {

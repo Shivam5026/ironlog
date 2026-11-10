@@ -4,6 +4,7 @@ import { queryKeys } from "@/shared/lib/queryKey";
 import { workoutSessionApi } from "../api/workout-session";
 import { showNewPersonalRecordToasts } from "../utils/personalRecords";
 import { invalidateWorkoutAnalytics, invalidatePersonalRecordAnalytics } from "../../analytics/hooks/invalidate-analytics";
+import { invalidateRecoveryQueries } from "../../recovery/hooks/invalidate-recovery";
 
 export function useActiveWorkout(sessionId: string) {
   const queryClient = useQueryClient();
@@ -40,6 +41,7 @@ export function useActiveWorkout(sessionId: string) {
       queryClient.invalidateQueries({ queryKey: queryKeys.workoutHistory });
       queryClient.invalidateQueries({ queryKey: queryKeys.streak });
       invalidateWorkoutAnalytics();
+      invalidateRecoveryQueries();
 
       if (newPRs.length > 0) {
         invalidatePersonalRecordAnalytics();

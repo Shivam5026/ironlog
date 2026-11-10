@@ -10,8 +10,13 @@ export const MUSCLE_GROUPS = [
   "Back",
   "Legs",
   "Shoulders",
-  "Arms",
+  "Biceps",
+  "Triceps",
+  "Forearms",
   "Core",
+  "Glutes",
+  "Hamstrings",
+  "Calves",
 ] as const;
 
 export type MuscleGroup = (typeof MUSCLE_GROUPS)[number];
@@ -31,11 +36,7 @@ const MUSCLE_TO_GROUP: Record<string, MuscleGroup> = {
 
   // Legs
   quadriceps: "Legs",
-  hamstrings: "Legs",
-  glutes: "Legs",
-  calves: "Legs",
   "upper legs": "Legs",
-  "lower legs": "Legs",
   hip: "Legs",
   "hip flexors": "Legs",
   adductors: "Legs",
@@ -46,13 +47,16 @@ const MUSCLE_TO_GROUP: Record<string, MuscleGroup> = {
   shoulders: "Shoulders",
   rotator: "Shoulders",
 
-  // Arms
-  biceps: "Arms",
-  triceps: "Arms",
-  forearms: "Arms",
-  "upper arms": "Arms",
-  brachialis: "Arms",
-  brachioradialis: "Arms",
+  // Biceps
+  biceps: "Biceps",
+  brachialis: "Biceps",
+
+  // Triceps
+  triceps: "Triceps",
+
+  // Forearms
+  forearms: "Forearms",
+  brachioradialis: "Forearms",
 
   // Core
   abdominals: "Core",
@@ -60,11 +64,36 @@ const MUSCLE_TO_GROUP: Record<string, MuscleGroup> = {
   obliques: "Core",
   waist: "Core",
   "serratus anterior": "Core",
+
+  // Glutes
+  glutes: "Glutes",
+
+  // Hamstrings
+  hamstrings: "Hamstrings",
+
+  // Calves
+  calves: "Calves",
+  "lower legs": "Calves",
 };
 
 function mapMuscleToGroup(muscle: string): MuscleGroup | null {
   const normalized = muscle.toLowerCase().trim();
   return MUSCLE_TO_GROUP[normalized] ?? null;
+}
+
+/**
+ * Maps a list of raw muscle names (e.g. ["pectorals", "triceps"]) to the
+ * distinct muscle groups they belong to. Unlike classifyExercise this
+ * preserves which groups a specific muscle list maps to, so callers can
+ * apply different treatment per list (e.g. primary vs secondary muscles).
+ */
+export function mapMuscleNamesToGroups(muscles: string[]): MuscleGroup[] {
+  const groups = new Set<MuscleGroup>();
+  for (const muscle of muscles) {
+    const group = mapMuscleToGroup(muscle);
+    if (group) groups.add(group);
+  }
+  return Array.from(groups);
 }
 
 // ── Name-based fallback classification ────────────────────────────
@@ -82,6 +111,8 @@ const NAME_TO_GROUP: Record<string, MuscleGroup> = {
   "incline press": "Chest",
   "incline dumbbell": "Chest",
   "pec deck": "Chest",
+  // Specific before generic so substring matching stays accurate.
+  "tricep dip": "Triceps",
   dip: "Chest",
   dips: "Chest",
 
@@ -111,19 +142,14 @@ const NAME_TO_GROUP: Record<string, MuscleGroup> = {
   "goblet squat": "Legs",
   "leg press": "Legs",
   "leg extension": "Legs",
-  "leg curl": "Legs",
-  "hamstring curl": "Legs",
   lunge: "Legs",
   lunges: "Legs",
   "bulgarian split": "Legs",
-  "romanian deadlift": "Legs",
-  rdl: "Legs",
-  hip: "Legs",
-  "hip thrust": "Legs",
-  "hip extension": "Legs",
-  calf: "Legs",
-  "calf raise": "Legs",
   "leg raise": "Legs",
+  // Specific before generic "hip" so substring matching stays accurate.
+  "hip thrust": "Glutes",
+  "hip extension": "Legs",
+  hip: "Legs",
 
   // Shoulders
   overhead: "Shoulders",
@@ -138,18 +164,30 @@ const NAME_TO_GROUP: Record<string, MuscleGroup> = {
   upright: "Shoulders",
   "upright row": "Shoulders",
 
-  // Arms
-  curl: "Arms",
-  "bicep curl": "Arms",
-  "hammer curl": "Arms",
-  "preacher curl": "Arms",
-  "tricep pushdown": "Arms",
-  "tricep extension": "Arms",
-  "skull crusher": "Arms",
-  "close grip": "Arms",
-  "tricep dip": "Arms",
-  "forearm curl": "Arms",
-  "wrist curl": "Arms",
+  // Hamstrings (specific "curl" family ordered before the generic key)
+  "leg curl": "Hamstrings",
+  "hamstring curl": "Hamstrings",
+  "romanian deadlift": "Hamstrings",
+  rdl: "Hamstrings",
+
+  // Biceps
+  "bicep curl": "Biceps",
+  "hammer curl": "Biceps",
+  "preacher curl": "Biceps",
+
+  // Triceps
+  "tricep pushdown": "Triceps",
+  "tricep extension": "Triceps",
+  "skull crusher": "Triceps",
+  "close grip": "Triceps",
+
+  // Forearms
+  "forearm curl": "Forearms",
+  "wrist curl": "Forearms",
+
+  // Calves
+  "calf raise": "Calves",
+  calf: "Calves",
 
   // Core
   plank: "Core",
@@ -162,6 +200,9 @@ const NAME_TO_GROUP: Record<string, MuscleGroup> = {
   "ab rollout": "Core",
   "woodchop": "Core",
   "pallof press": "Core",
+
+  // Generic curl (last so every specific "…curl" key matches first).
+  curl: "Biceps",
 };
 
 function classifyByName(exerciseName: string): MuscleGroup | null {
