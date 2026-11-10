@@ -14,6 +14,7 @@ IronLog is a modern fitness application built for gym enthusiasts who want more 
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
 - [Environment Variables](#environment-variables)
+- [Testing](#testing)
 - [API Overview](#api-overview)
 - [Documentation](#documentation)
 - [Development Roadmap](#development-roadmap)
@@ -36,9 +37,12 @@ IronLog is a modern fitness application built for gym enthusiasts who want more 
 | Body weight tracking | ✅ Done |
 | Personal records & 1RM estimation | ✅ Done |
 | Analytics & charts | ✅ Done |
+| Progressive overload & plateau detection | ✅ Done |
+| Recovery, readiness & recommendations | ✅ Done |
+| Weekly & monthly reports | ✅ Done |
+| Progress photos (upload/delete + timeline) | ✅ Done |
 | Redis caching layer | ✅ Done |
-| Smart insights & recovery | 🔜 Planned |
-| Progress photos | 🔜 Planned |
+| Before/after photo comparison | 🔜 Planned |
 | Achievements | 🔜 Planned |
 
 ---
@@ -104,17 +108,38 @@ IronLog is a modern fitness application built for gym enthusiasts who want more 
 - **Statistics** — Centralized aggregate stats (total volume, sets, reps, avg duration, avg weekly frequency)
 - All charts support 7-day, 30-day, and all-time ranges
 
+**🧠 Smart Insights**
+- Progressive overload detection from historical volume and intensity
+- Plateau detection for stalled lifts
+- Per-exercise recommendations based on recent performance
+
+**💤 Recovery, Readiness & Recommendations**
+- Muscle recovery summary with fatigue and status per muscle group
+- Daily readiness score and training recommendation
+- Overtraining and fatigue indicators
+- Recovery timeline, trends, and reports
+- Exercise recommendations that account for current recovery
+
+**📈 Weekly & Monthly Reports**
+- Generated training summaries for a selected week or month
+- CSV export for weekly and monthly reports
+
+**📸 Progress Photos**
+- Upload photos to Cloudinary with category, weight, notes, and recorded date
+- Server-side validation and optimization with Sharp (resized to WebP, max 1600px)
+- Timeline grouped by year → month, newest first
+- Delete with ownership checks and Cloudinary asset cleanup
+
 **⚡ Performance & Caching**
-- Redis caching for dashboard and exercise lookups (24h TTL)
+- Redis caching for dashboard, analytics, recovery, and exercise lookups
 - TanStack Query for client-side state with consistent query keys
 - Optimistic updates for live workout mutations
-- Cache invalidation after workout completion, body-weight changes, and PR updates
+- Cache invalidation after workout completion, body-weight changes, photo changes, and PR updates
 
 ### 🔜 Planned
 
-- **Smart Insights** — Progressive overload recommendations, recovery estimation, weekly reports
-- **Recovery Tracking** — Muscle group recovery status and fatigue scores
-- **Progress Photos** — Upload physique images, timeline view, before/after comparison
+- **Before & After Comparison** — Image slider, side-by-side view, fullscreen viewer, zoom
+- **Enhanced Photo Uploader** — Drag-and-drop, upload progress, richer previews
 - **Achievements** — First Workout, 7-Day Streak, 100 Workouts, and more
 
 ---
@@ -151,17 +176,21 @@ IronLog is a modern fitness application built for gym enthusiasts who want more 
 | [PostgreSQL](https://www.postgresql.org) | Database |
 | [Prisma ORM](https://www.prisma.io) (7) | Database access & migrations |
 | [Better Auth](https://www.better-auth.com) | Authentication |
-| [Redis](https://redis.io) | Caching layer (dashboard, exercises) |
+| [Redis](https://redis.io) | Caching layer (dashboard, analytics, recovery, exercises) |
 | [Helmet](https://helmetjs.github.io) | Security headers |
 | [express-rate-limit](https://express-rate-limit.mintlify.app) | Rate limiting |
 | [Morgan](https://github.com/expressjs/morgan) | HTTP logging |
 | [Compression](https://github.com/expressjs/compression) | Response compression |
 | [Zod](https://zod.dev) | Request validation |
+| [Cloudinary](https://cloudinary.com) | Progress photo storage & CDN |
+| [Sharp](https://sharp.pixelplumbing.com) | Image validation & optimization |
+| [Multer](https://github.com/expressjs/multer) | Multipart file uploads |
 | [tsx](https://tsx.is) | TypeScript execution & watch mode |
 
 ### External Services
 
 - [ExerciseDB API](https://exercisedb.p.rapidapi.com) — Exercise library data (cached in Redis for 24h)
+- [Cloudinary](https://cloudinary.com) — Progress photo storage, optimization, and delivery
 
 ---
 
@@ -185,6 +214,9 @@ ironlog/
 │       │   ├── body-weight/         # Weight logging, history, chart
 │       │   ├── dashboard/           # Dashboard page & widgets
 │       │   ├── exercise/            # Exercise library, filters, details
+│       │   ├── progress-photos/     # Photo upload, year/month timeline, delete
+│       │   ├── recovery/            # Readiness, recommendations, timeline, trends
+│       │   ├── reports/             # Weekly/monthly report cards & hooks
 │       │   ├── streak/              # Streak summary & page
 │       │   ├── workout-exercises/   # Exercise CRUD within plan days
 │       │   ├── workout-history/     # Session list, details, filters
@@ -196,17 +228,17 @@ ironlog/
 │       ├── shared/                  # Shared UI & utilities
 │       │   ├── components/ui/       # shadcn-style primitives
 │       │   ├── config/              # Navigation, query keys
-│       │   ├── lib/                 # Axios, auth client, query client, cache
+│       │   ├── lib/                 # Axios, auth/query clients, query keys, errors
 │       │   └── types/
 │       └── layouts/                 # Root, Auth, Dashboard layouts
 │
 ├── server/                          # Express backend
 │   └── src/
-│       ├── config/                  # Env, Prisma, Redis config
+│       ├── config/                  # Env, Prisma, Redis, Cloudinary config
 │       ├── lib/                     # Cache utilities (withCache, getCache, setCache)
 │       ├── middlewares/             # auth, validate, rateLimiter, errorHandler
 │       ├── modules/                 # Feature-based modules
-│       │   ├── analytics/           # Volume, frequency, exercise/muscle distribution, statistics
+│       │   ├── analytics/           # Volume, frequency, distribution, trends, overload/plateau
 │       │   │   ├── controllers/
 │       │   │   ├── routes/
 │       │   │   ├── services/
@@ -218,12 +250,16 @@ ironlog/
 │       │   ├── exercise/            # ExerciseDB API integration with Redis caching
 │       │   ├── personal-record/     # PR computation, 1RM estimation, sync
 │       │   ├── profile/             # Profile CRUD
+│       │   ├── progress-photo/      # Upload/delete/timeline (Cloudinary + Sharp + Multer)
+│       │   ├── recovery/            # Readiness, recommendations, overtraining, timeline, analytics
+│       │   ├── reports/             # Weekly/monthly reports with CSV export
 │       │   ├── streak/              # Streak calculation (current, longest, active days)
 │       │   ├── workout-day/         # Workout day CRUD
 │       │   ├── workout-exercise/    # Exercise CRUD within days
+│       │   ├── workout-history/     # Paginated history and session details
 │       │   ├── workout-plan/        # Workout plan CRUD
 │       │   ├── workout-session/     # Session lifecycle, sets, completion, recovery
-│       │   └── workout-template/    # Template CRUD
+│       │   └── template/            # Template CRUD
 │       ├── utils/                   # ApiError, ApiResponse, asyncHandler, workoutStats
 │       └── types/                   # Express type extensions
 │
@@ -237,10 +273,11 @@ ironlog/
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org) (v18+)
+- [Node.js](https://nodejs.org) (v20+)
 - [PostgreSQL](https://www.postgresql.org) database
-- [Redis](https://redis.io) instance
+- [Redis](https://redis.io) instance (optional — the app falls back to PostgreSQL when unavailable)
 - An [ExerciseDB API](https://rapidapi.com/justin-WFnsXH_t5/api/exercisedb) key (free tier)
+- A [Cloudinary](https://cloudinary.com) account (free tier) for progress photo storage
 
 ### Clone & Install
 
@@ -298,7 +335,28 @@ BETTER_AUTH_URL=http://localhost:5000
 EXERCISE_DB_API_KEY=your-rapidapi-key
 
 REDIS_URL=redis://localhost:6379
+
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
 ```
+
+---
+
+## 🧪 Testing
+
+```bash
+# Backend test suite (Node test runner via tsx)
+cd server && npm test
+
+# Frontend typecheck
+cd client && npx tsc -b
+
+# Frontend end-to-end tests (Playwright)
+cd client && npm run test:e2e
+```
+
+The backend suite covers authentication and session handling, validation, service logic, caching, recovery, and reports. Progress-photo flows are exercised with targeted mocked checks.
 
 ---
 
@@ -313,15 +371,21 @@ REDIS_URL=redis://localhost:6379
 | Workout Days | `GET/POST /api/workout-days?planId=`, `PUT/DELETE /:id`, `/reorder` | ✅ |
 | Workout Exercises | `GET/POST /api/workout-exercises?dayId=`, `PUT/DELETE /:id`, `/reorder`, `/:id/replace` | ✅ |
 | Templates | `GET/POST /api/templates`, `PUT/DELETE /:id`, `/:id/use` | ✅ |
-| Workout Sessions | `POST /start`, `GET /:id`, `PUT /:id/pause`, `/resume`, `/finish` | ✅ |
-| Workout Summary | `GET /:id/summary`, `POST /:id/complete` | ✅ |
-| Sets | `POST /:id/sets`, `PUT/DELETE /sets/:setId`, `/:id/sets/reorder` | ✅ |
-| Exercise Logs | `POST /:id/exercise-logs`, `PUT/DELETE /exercise-logs/:logId` | ✅ |
+| Workout Sessions | `POST /api/workout-sessions/start`, `GET /:id`, `PUT /:id/pause`, `/resume`, `POST /:id/finish` | ✅ |
+| Workout Summary | `GET /api/workout-sessions/:sessionId/summary`, `POST /:sessionId/complete` | ✅ |
+| Exercise Logs | `POST /api/exercise-logs`, `GET/PUT/DELETE /:id` | ✅ |
+| Exercise Log Sets | `POST /api/exercise-log-sets`, `PATCH /:id`, `/:id/complete`, `/reorder`, `DELETE /:id` | ✅ |
+| Performance | `GET /api/performance/exercise/:exerciseId`, `/history/:exerciseId` | ✅ |
+| Session Recovery | `GET /api/recovery/session/active`, `POST/DELETE /api/recovery/session/:sessionId` | ✅ |
+| Workout History | `GET /api/workout-history`, `GET /:id` | ✅ |
+| Recovery | `GET /api/recovery`, `/readiness`, `/recommendations`, `/recommendations/exercises`, `/overtraining`, `/timeline`, `/analytics/trends`, `/analytics/reports` | ✅ |
+| Reports | `GET /api/reports/weekly`, `/monthly`, `/weekly/export?format=csv`, `/monthly/export?format=csv` (PDF planned) | ✅ |
 | Body Weight | `GET/POST /api/body-weight`, `PUT/DELETE /:id` | ✅ |
+| Progress Photos | `GET/POST /api/progress-photos` (optional `limit`/`offset`), `DELETE /:id` | ✅ |
 | Personal Records | `GET /api/personal-records`, `GET /:exerciseId` | ✅ |
 | Streak | `GET /api/streak` | ✅ |
 | Dashboard | `GET /api/dashboard`, `/stats`, `/recent-plans`, `/recent-templates` | ✅ |
-| Analytics | `GET /api/analytics/statistics`, `/volume`, `/frequency`, `/exercise-distribution`, `/muscle-distribution` | ✅ |
+| Analytics | `GET /api/analytics/dashboard`, `/statistics`, `/volume`, `/volume/muscles`, `/volume/exercises`, `/trends`, `/trends/exercises`, `/frequency`, `/exercise-distribution`, `/muscle-distribution`, `/muscles`, `/consistency`, `/progressive-overload`, `/progressive-overload/detection`, `/progressive-overload/plateaus` | ✅ |
 
 ---
 
@@ -367,13 +431,17 @@ Project docs live in the `docs/` directory:
 - [x] Statistics service (total volume, sets, reps, avg duration, avg frequency)
 - [x] Body weight tracking & chart
 - [x] Personal records & 1RM estimation
-- [x] Redis caching layer for dashboard & exercises
+- [x] Progressive overload detection & plateau detection
+- [x] Redis caching layer for dashboard, analytics, recovery & exercises
 - [x] TanStack Query integration with consistent query keys & invalidation
 
-### Phase 5 — Polish 🔜
-- [ ] Smart Insights — Progressive overload recommendations
-- [ ] Recovery Tracking — Muscle group recovery status
-- [ ] Progress Photos (Cloudinary)
+### Phase 5 — Polish 🚧
+- [x] Smart insights — Progressive overload & plateau detection
+- [x] Recovery tracking — Readiness, recommendations, timeline & trends
+- [x] Weekly & monthly reports with CSV export
+- [x] Progress photos — Cloudinary upload/delete + year/month timeline
+- [ ] Before & after comparison — Image slider, side-by-side, fullscreen viewer, zoom
+- [ ] Enhanced uploader — Drag-and-drop and upload progress
 - [ ] Achievements system
 - [ ] Performance optimization
 - [ ] Deployment
@@ -386,16 +454,20 @@ Project docs live in the `docs/` directory:
 - [x] **Training Volume Calculation** — Sum of `weight * reps` across all completed sets
 - [x] **Workout Streak Tracking** — Consecutive calendar days with completed sessions
 - [x] **Muscle Group Distribution** — Exercise metadata mapped to 6 categories (Chest, Back, Legs, Shoulders, Arms, Core)
-- [ ] Progressive Overload Detection — Planned
-- [ ] Recovery Estimation — Planned
+- [x] **Progressive Overload Detection** — Compares recent per-exercise performance to surface improving lifts
+- [x] **Plateau Detection** — Classifies lifts as progressing, stagnant, missed progression, or declining over recent performances
+- [x] **Recovery Estimation** — Per-muscle fatigue decay with estimated hours until full recovery and a daily readiness score
+- [x] **Weekly & Monthly Reporting** — Aggregates volume, sets, sessions, and muscle distribution over calendar week/month boundaries
 
 ---
 
 ## 🔒 Security
 
 - Better Auth for authentication & session management
-- Protected API routes with ownership validation
-- Input validation (Zod)
+- Protected API routes; every resource is scoped to the authenticated user
+- Input validation (Zod) on params, query strings, and request bodies
+- Image upload hardening: MIME allowlist (JPEG/PNG/WebP), 5 MB Multer limit, Sharp content validation, and re-encoding to WebP
+- Cloudinary credentials stay server-side; photo deletes check ownership before removing the stored asset
 - CORS protection
 - Helmet security headers
 - Rate limiting
